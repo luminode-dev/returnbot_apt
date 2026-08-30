@@ -1,0 +1,20 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# --- colcon / ROS 2 ---
+build/
+install/
+log/
+
+# --- 생성 산출물 (생성기가 재생성 가능하므로 커밋하지 않는다) ---
+returnbot_ws/src/returnbot_env/worlds/*.sdf
+returnbot_ws/src/returnbot_env/worlds/*.usd
+
+# --- 에디터 ---
+.vscode/
+.idea/

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>returnbot_env</name>
+  <version>0.1.0</version>
+  <description>
+    한국 아파트 공용부(편복도/중복도/엘리베이터홀) 파라메트릭 월드 생성기.
+    하나의 중립 IR에서 Gazebo SDF와 평면도 SVG를 생성한다. USD는 Phase 4 예정.
+  </description>
+  <maintainer email="luminode00@gmail.com">luminode</maintainer>
+
+  <!-- TODO(확인): 저장소 라이선스가 아직 정해지지 않았다. LICENSE 파일 추가 시 함께 갱신할 것. -->
+  <license>TODO</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>python3-yaml</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,14 @@
+# 소스가 Windows(편집) <-> WSL/Ubuntu(빌드·실행)를 오가므로 저장소 안은 LF로 통일한다.
+# CRLF가 섞이면 shebang 스크립트 실행과 colcon 빌드가 깨진다.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.fbx binary
+*.usd binary
+*.usda binary
+*.usdc binary
+*.stl binary
+*.dae binary
+*.pgm binary

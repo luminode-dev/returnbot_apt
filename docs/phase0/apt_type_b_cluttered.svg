@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1262" height="351" viewBox="0 0 1262 351">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>text{font-family:'DejaVu Sans',sans-serif}</style>
+<polygon points="81.00,180.00 469.44,180.00 469.44,81.00 81.00,81.00" fill="#eceae4" stroke="#cfccc4" stroke-width="0.8" fill-opacity="0.9"><title>floor_lower</title></polygon>
+<polygon points="572.56,180.00 1181.00,180.00 1181.00,81.00 572.56,81.00" fill="#eceae4" stroke="#cfccc4" stroke-width="0.8" fill-opacity="0.9"><title>floor_upper</title></polygon>
+<polygon points="469.44,180.00 572.78,180.00 572.78,81.00 469.44,81.00" fill="#cfd6c2" stroke="#9aa38a" stroke-width="0.8" fill-opacity="0.9"><title>floor_ramp</title></polygon>
+<polygon points="81.00,81.00 166.25,81.00 166.25,70.00 81.00,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg0</title></polygon>
+<polygon points="215.75,81.00 386.25,81.00 386.25,70.00 215.75,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg1</title></polygon>
+<polygon points="435.75,81.00 606.25,81.00 606.25,70.00 435.75,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg2</title></polygon>
+<polygon points="655.75,81.00 826.25,81.00 826.25,70.00 655.75,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg3</title></polygon>
+<polygon points="875.75,81.00 1046.25,81.00 1046.25,70.00 875.75,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg4</title></polygon>
+<polygon points="1095.75,81.00 1181.00,81.00 1181.00,70.00 1095.75,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_seg5</title></polygon>
+<polygon points="166.25,73.30 215.75,73.30 215.75,70.00 166.25,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_doorback0</title></polygon>
+<polygon points="166.25,81.00 215.75,81.00 215.75,73.30 166.25,73.30" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_lintel0</title></polygon>
+<polygon points="386.25,73.30 435.75,73.30 435.75,70.00 386.25,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_doorback1</title></polygon>
+<polygon points="386.25,81.00 435.75,81.00 435.75,73.30 386.25,73.30" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_lintel1</title></polygon>
+<polygon points="606.25,73.30 655.75,73.30 655.75,70.00 606.25,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_doorback2</title></polygon>
+<polygon points="606.25,81.00 655.75,81.00 655.75,73.30 606.25,73.30" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_lintel2</title></polygon>
+<polygon points="826.25,73.30 875.75,73.30 875.75,70.00 826.25,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_doorback3</title></polygon>
+<polygon points="826.25,81.00 875.75,81.00 875.75,73.30 826.25,73.30" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_lintel3</title></polygon>
+<polygon points="1046.25,73.30 1095.75,73.30 1095.75,70.00 1046.25,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_doorback4</title></polygon>
+<polygon points="1046.25,81.00 1095.75,81.00 1095.75,73.30 1046.25,73.30" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_lintel4</title></polygon>
+<polygon points="81.00,191.00 166.25,191.00 166.25,180.00 81.00,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg0</title></polygon>
+<polygon points="215.75,191.00 386.25,191.00 386.25,180.00 215.75,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg1</title></polygon>
+<polygon points="435.75,191.00 606.25,191.00 606.25,180.00 435.75,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg2</title></polygon>
+<polygon points="655.75,191.00 826.25,191.00 826.25,180.00 655.75,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg3</title></polygon>
+<polygon points="875.75,191.00 1046.25,191.00 1046.25,180.00 875.75,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg4</title></polygon>
+<polygon points="1095.75,191.00 1181.00,191.00 1181.00,180.00 1095.75,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_seg5</title></polygon>
+<polygon points="166.25,191.00 215.75,191.00 215.75,187.70 166.25,187.70" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_doorback0</title></polygon>
+<polygon points="166.25,187.70 215.75,187.70 215.75,180.00 166.25,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_lintel0</title></polygon>
+<polygon points="386.25,191.00 435.75,191.00 435.75,187.70 386.25,187.70" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_doorback1</title></polygon>
+<polygon points="386.25,187.70 435.75,187.70 435.75,180.00 386.25,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_lintel1</title></polygon>
+<polygon points="606.25,191.00 655.75,191.00 655.75,187.70 606.25,187.70" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_doorback2</title></polygon>
+<polygon points="606.25,187.70 655.75,187.70 655.75,180.00 606.25,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_lintel2</title></polygon>
+<polygon points="826.25,191.00 875.75,191.00 875.75,187.70 826.25,187.70" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_doorback3</title></polygon>
+<polygon points="826.25,187.70 875.75,187.70 875.75,180.00 826.25,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_lintel3</title></polygon>
+<polygon points="1046.25,191.00 1095.75,191.00 1095.75,187.70 1046.25,187.70" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_doorback4</title></polygon>
+<polygon points="1046.25,187.70 1095.75,187.70 1095.75,180.00 1046.25,180.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_lintel4</title></polygon>
+<polygon points="70.00,191.00 81.00,191.00 81.00,70.00 70.00,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>end_wall_near</title></polygon>
+<polygon points="1181.00,191.00 1192.00,191.00 1192.00,155.25 1181.00,155.25" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>fire_door_far_jamb0</title></polygon>
+<polygon points="1181.00,105.75 1192.00,105.75 1192.00,70.00 1181.00,70.00" fill="#5a5f66" stroke="#33373c" stroke-width="0.8" fill-opacity="0.9"><title>fire_door_far_jamb1</title></polygon>
+<polygon points="166.25,81.55 215.75,81.55 215.75,74.95 166.25,74.95" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_threshold0</title></polygon>
+<polygon points="386.25,81.55 435.75,81.55 435.75,74.95 386.25,74.95" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_threshold1</title></polygon>
+<polygon points="606.25,81.55 655.75,81.55 655.75,74.95 606.25,74.95" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_threshold2</title></polygon>
+<polygon points="826.25,81.55 875.75,81.55 875.75,74.95 826.25,74.95" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_threshold3</title></polygon>
+<polygon points="1046.25,81.55 1095.75,81.55 1095.75,74.95 1046.25,74.95" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_threshold4</title></polygon>
+<polygon points="166.25,186.05 215.75,186.05 215.75,179.45 166.25,179.45" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_threshold0</title></polygon>
+<polygon points="386.25,186.05 435.75,186.05 435.75,179.45 386.25,179.45" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_threshold1</title></polygon>
+<polygon points="606.25,186.05 655.75,186.05 655.75,179.45 606.25,179.45" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_threshold2</title></polygon>
+<polygon points="826.25,186.05 875.75,186.05 875.75,179.45 826.25,179.45" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_threshold3</title></polygon>
+<polygon points="1046.25,186.05 1095.75,186.05 1095.75,179.45 1046.25,179.45" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_threshold4</title></polygon>
+<polygon points="166.25,75.50 215.75,75.50 215.75,73.30 166.25,73.30" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_door0</title></polygon>
+<polygon points="386.25,75.50 435.75,75.50 435.75,73.30 386.25,73.30" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_door1</title></polygon>
+<polygon points="606.25,75.50 655.75,75.50 655.75,73.30 606.25,73.30" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_door2</title></polygon>
+<polygon points="826.25,75.50 875.75,75.50 875.75,73.30 826.25,73.30" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_door3</title></polygon>
+<polygon points="1046.25,75.50 1095.75,75.50 1095.75,73.30 1046.25,73.30" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_pos_door4</title></polygon>
+<polygon points="166.25,187.70 215.75,187.70 215.75,185.50 166.25,185.50" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_door0</title></polygon>
+<polygon points="386.25,187.70 435.75,187.70 435.75,185.50 386.25,185.50" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_door1</title></polygon>
+<polygon points="606.25,187.70 655.75,187.70 655.75,185.50 606.25,185.50" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_door2</title></polygon>
+<polygon points="826.25,187.70 875.75,187.70 875.75,185.50 826.25,185.50" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_door3</title></polygon>
+<polygon points="1046.25,187.70 1095.75,187.70 1095.75,185.50 1046.25,185.50" fill="#7a5230" stroke="#4d3218" stroke-width="0.8" fill-opacity="0.9"><title>wall_neg_door4</title></polygon>
+<polygon points="1131.50,110.15 1181.00,110.15 1181.00,105.75 1131.50,105.75" fill="#8b5fbf" stroke="#5d3b85" stroke-width="0.8" fill-opacity="0.9"><title>fire_door_far_leaf_open</title></polygon>
+<polygon points="215.75,94.75 222.35,94.75 222.35,81.00 215.75,81.00" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8" fill-opacity="0.9"><title>milk_box0</title></polygon>
+<polygon points="435.75,94.75 442.35,94.75 442.35,81.00 435.75,81.00" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8" fill-opacity="0.9"><title>milk_box1</title></polygon>
+<polygon points="655.75,94.75 662.35,94.75 662.35,81.00 655.75,81.00" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8" fill-opacity="0.9"><title>milk_box2</title></polygon>
+<polygon points="875.75,94.75 882.35,94.75 882.35,81.00 875.75,81.00" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8" fill-opacity="0.9"><title>milk_box3</title></polygon>
+<polygon points="1095.75,94.75 1102.35,94.75 1102.35,81.00 1095.75,81.00" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8" fill-opacity="0.9"><title>milk_box4</title></polygon>
+<polygon points="281.75,180.00 320.25,180.00 320.25,169.00 281.75,169.00" fill="#e08a1e" stroke="#a45f0d" stroke-width="0.8" fill-opacity="0.9"><title>hydrant_box</title></polygon>
+<polygon points="120.23,106.42 123.67,119.73 214.19,96.33 210.75,83.02" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter0_bicycle</title></polygon>
+<polygon points="385.78,94.89 395.66,117.58 425.92,104.41 416.03,81.72" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter1_stroller</title></polygon>
+<polygon points="588.21,99.18 678.07,125.02 681.87,111.80 592.01,85.97" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter2_bicycle</title></polygon>
+<polygon points="839.83,84.37 840.99,109.09 873.96,107.54 872.79,82.82" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter3_stroller</title></polygon>
+<polygon points="1019.01,107.35 1022.69,120.60 1112.78,95.57 1109.10,82.32" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter4_bicycle</title></polygon>
+<polygon points="119.46,165.02 125.80,177.22 208.78,134.15 202.45,121.94" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter5_bicycle</title></polygon>
+<polygon points="414.03,151.47 416.42,173.34 438.29,170.96 435.90,149.09" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter6_box_stack</title></polygon>
+<polygon points="624.85,168.19 644.74,177.58 654.13,157.69 634.24,148.29" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter7_box_stack</title></polygon>
+<polygon points="809.17,152.26 810.95,174.19 832.88,172.41 831.10,150.48" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter8_box_stack</title></polygon>
+<polygon points="1080.23,153.72 1090.93,172.94 1110.15,162.24 1099.45,143.02" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8" fill-opacity="0.9"><title>clutter9_box_stack</title></polygon>
+<text x="70" y="28" font-size="17" font-weight="600" fill="#222">유형 B — 중복도형</text>
+<line x1="159.8" y1="180.0" x2="159.8" y2="81.0" stroke="#c0392b" stroke-width="1.6"/>
+<line x1="153.8" y1="180.0" x2="165.8" y2="180.0" stroke="#c0392b" stroke-width="1.6"/>
+<line x1="153.8" y1="81.0" x2="165.8" y2="81.0" stroke="#c0392b" stroke-width="1.6"/>
+<text x="168.8" y="130.5" font-size="13" fill="#c0392b">1.80 m</text>
+<text x="70" y="48" font-size="13" fill="#555">복도 유효폭 1.80 m · 길이 20.0 m</text>
+<text x="521.0" y="64.0" font-size="12" text-anchor="middle" fill="#5a6b3a">경사로 8% · 단차 150 mm</text>
+<line x1="1137.0" y1="217.0" x2="1192.0" y2="217.0" stroke="#222" stroke-width="2"/>
+<text x="1164.5" y="212.0" font-size="11" text-anchor="middle" fill="#222">1 m</text>
+<rect x="70.0" y="291.0" width="13" height="13" fill="#5a5f66" stroke="#33373c" stroke-width="0.8"/>
+<text x="88.0" y="302.0" font-size="12" fill="#333">벽</text>
+<rect x="117.0" y="291.0" width="13" height="13" fill="#7a5230" stroke="#4d3218" stroke-width="0.8"/>
+<text x="135.0" y="302.0" font-size="12" fill="#333">세대문</text>
+<rect x="190.0" y="291.0" width="13" height="13" fill="#8b5fbf" stroke="#5d3b85" stroke-width="0.8"/>
+<text x="208.0" y="302.0" font-size="12" fill="#333">방화문</text>
+<rect x="263.0" y="291.0" width="13" height="13" fill="#8f8f96" stroke="#5c5c62" stroke-width="0.8"/>
+<text x="281.0" y="302.0" font-size="12" fill="#333">문턱</text>
+<rect x="323.0" y="291.0" width="13" height="13" fill="#cfd6c2" stroke="#9aa38a" stroke-width="0.8"/>
+<text x="341.0" y="302.0" font-size="12" fill="#333">경사로</text>
+<rect x="396.0" y="291.0" width="13" height="13" fill="#e08a1e" stroke="#a45f0d" stroke-width="0.8"/>
+<text x="414.0" y="302.0" font-size="12" fill="#333">소화전함</text>
+<rect x="482.0" y="291.0" width="13" height="13" fill="#d8b34a" stroke="#9c7f22" stroke-width="0.8"/>
+<text x="500.0" y="302.0" font-size="12" fill="#333">우유함</text>
+<rect x="555.0" y="291.0" width="13" height="13" fill="#c94f4f" stroke="#8c2f2f" stroke-width="0.8"/>
+<text x="573.0" y="302.0" font-size="12" fill="#333">적치물</text>
+</svg>

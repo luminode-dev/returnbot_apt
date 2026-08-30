@@ -1,0 +1,256 @@
+# 리턴봇 파라메트릭 월드 — 치수 원본 (Single Source of Truth)
+#
+# 단위: 길이 m, 각도 rad, 질량 kg
+# 모든 값은 {value, confidence, source} 형태로 근거를 함께 기록한다.
+#   confidence: confirmed = 법령 명시 / reference = 공개자료·법령 정합 / todo = 근거 미확보
+# 근거 상세는 docs/env_reference.md 참조. 코드에 상수를 하드코딩하지 말 것 (명세 §7).
+
+meta:
+  reference_doc: docs/env_reference.md
+  units: m
+
+# ---------------------------------------------------------------- 공통 구조물
+common:
+  wall_thickness:
+    value: 0.2
+    confidence: reference
+    source: "주택건설기준 등에 관한 규정 제14조 (세대간 경계벽 조적조 20cm 이상). 복도벽 자체 규정은 아니며 대표값으로 사용"
+  wall_height:
+    value: 2.8
+    confidence: reference
+    source: "LH 설계공모지침서 주거동 층고 2.8m 이상"
+  floor_thickness:
+    value: 0.05
+    confidence: todo
+    source: "시뮬 편의상 값. 주행에 영향 없음"
+
+  door:
+    width:
+      value: 0.9
+      confidence: todo
+      source: "TODO(확인) 명세 §2.2 가정값. 공동주택 세대 현관문은 편의법 의무 대상이 아니라 법정 최소가 없음"
+    height:
+      value: 2.1
+      confidence: todo
+      source: "TODO(확인) 실측 필요"
+    recess_depth:
+      value: 0.1
+      confidence: todo
+      source: "TODO(확인) 현관 우묵이 깊이. 로봇 정차 여유에 영향"
+    pitch:
+      value: 4.0
+      confidence: todo
+      source: "TODO(확인) 세대 간 현관문 간격. 평면 유형(59/84m^2)에 따라 상이"
+
+  threshold:
+    height:
+      value: 0.015
+      confidence: todo
+      source: "TODO(확인) 명세 §2.2 가정 (5~20mm 가변). 주행 성패를 직접 가르는 값 - 반드시 실측"
+    depth:
+      value: 0.12
+      confidence: todo
+      source: "TODO(확인) 실측 필요"
+
+  ramp:
+    grade:
+      value: 0.08
+      confidence: reference
+      source: "장애인등편의법 시행규칙 별표1 경사로 기울기 1/12(약 8.33%) 이하와 정합"
+    rise:
+      value: 0.15
+      confidence: todo
+      source: "TODO(확인) 복도 단차 높이. 경사로 길이는 rise/grade 로 산출됨(0.15/0.08 = 1.875m)"
+
+  hydrant_box:          # 옥내소화전함 (벽 돌출)
+    width:
+      value: 0.7
+      confidence: todo
+      source: "TODO(확인) 성능인증 기술기준에 외형 표준치수 없음. 제조사 사양서/현장 실측 필요"
+    height:
+      value: 0.8
+      confidence: todo
+      source: "TODO(확인) 동일"
+    protrusion:
+      value: 0.2
+      confidence: todo
+      source: "TODO(확인) 동일. 복도 유효폭을 실질적으로 잠식하는 값이라 중요"
+    mount_height:
+      value: 0.6
+      confidence: todo
+      source: "TODO(확인) 바닥에서 함 하단까지. LiDAR 높이와의 관계가 중요"
+
+  milk_box:             # 우유함
+    size:
+      value: [0.12, 0.25, 0.3]
+      confidence: todo
+      source: "TODO(확인) 표준 없음. 현장 실측"
+    mount_height:
+      value: 1.2
+      confidence: todo
+      source: "TODO(확인) LiDAR 스캔면(0.4m) 위쪽이면 주행 무관"
+
+  parapet:              # 편복도 개방측 난간
+    height:
+      value: 1.2
+      confidence: todo
+      source: "TODO(확인) 건축법상 난간 높이 기준 확인 필요. LiDAR가 개방측에서 반사를 못 받는 것이 핵심 (localization 난이도)"
+    thickness:
+      value: 0.15
+      confidence: todo
+      source: "TODO(확인)"
+
+  elevator:
+    door_width:
+      value: 0.8
+      confidence: confirmed
+      source: "장애인등편의법 시행규칙 별표1 - 승강기 출입문 통과유효폭 0.8m 이상 (최악 조건)"
+    door_width_new:
+      value: 0.9
+      confidence: confirmed
+      source: "동일 - 신축 건물 기준"
+    car_width:
+      value: 1.1
+      confidence: confirmed
+      source: "동일 - 승강기 내부 유효바닥 폭 1.1m 이상"
+    car_depth:
+      value: 1.35
+      confidence: confirmed
+      source: "동일 - 승강기 내부 유효바닥 깊이 1.35m 이상"
+    front_clearance:
+      value: 1.4
+      confidence: confirmed
+      source: "동일 - 승강기 전면 활동공간 1.4m x 1.4m 이상"
+
+# ------------------------------------------------------------ 세대 앞 적치물
+clutter:
+  density:
+    value: 0.3
+    confidence: todo
+    source: "세대당 적치물 배치 확률. 실증 단지 관찰로 보정 필요"
+  items:
+    stroller:
+      size: [0.6, 0.45, 1.0]
+      confidence: todo
+      source: "TODO(확인) 유모차 대표 치수"
+    bicycle:
+      size: [1.7, 0.25, 1.05]
+      confidence: todo
+      source: "TODO(확인) 성인용 자전거 대표 치수"
+    box_stack:
+      size: [0.4, 0.4, 0.6]
+      confidence: todo
+      source: "TODO(확인) 택배/재활용 적치 더미"
+
+# ------------------------------------------------------------------- 재질
+# mu/mu2는 전부 TODO. 명세 §8: 솔리드타이어 마찰은 시뮬-실기 갭이 크며 튜닝 시작점일 뿐.
+materials:
+  corridor_tile:
+    mu: 0.9
+    mu2: 0.9
+    rgba: [0.82, 0.79, 0.72, 1.0]
+    confidence: todo
+    source: "TODO(확인) 복도 타일 마찰계수. 실측 후 보정"
+  epoxy:
+    mu: 0.6
+    mu2: 0.6
+    rgba: [0.55, 0.58, 0.60, 1.0]
+    confidence: todo
+    source: "TODO(확인)"
+  concrete:
+    mu: 0.8
+    mu2: 0.8
+    rgba: [0.75, 0.75, 0.73, 1.0]
+    confidence: todo
+    source: "TODO(확인)"
+  metal:
+    mu: 0.4
+    mu2: 0.4
+    rgba: [0.55, 0.57, 0.60, 1.0]
+    confidence: todo
+    source: "TODO(확인)"
+  door_panel:
+    mu: 0.7
+    mu2: 0.7
+    rgba: [0.45, 0.33, 0.24, 1.0]
+    confidence: todo
+    source: "TODO(확인)"
+  obstacle:
+    mu: 0.7
+    mu2: 0.7
+    rgba: [0.30, 0.45, 0.65, 1.0]
+    confidence: todo
+    source: "TODO(확인)"
+
+# --------------------------------------------------------------- 유형 정의
+types:
+  A:
+    label: "편복도(갓복도)형"
+    description: "한쪽 벽면에 세대문 일렬, 반대편은 개방 난간. 법규 최소폭 1.2m가 최악 조건"
+    corridor_width:
+      value: 1.2
+      confidence: confirmed
+      source: "건축물의 피난·방화구조 등의 기준에 관한 규칙 제15조의2 제1항 - 공동주택 그 밖의 복도 1.2m 이상"
+    corridor_length:
+      value: 20.0
+      confidence: todo
+      source: "TODO(확인) 세대수 x door.pitch 로 산출. 실증 단지 확정 시 대체"
+    unit_count:
+      value: 5
+      confidence: todo
+      source: "TODO(확인) 한 개 층 세대수"
+    door_side: "+y"
+    open_side: "-y"
+    floor_material: corridor_tile
+
+  B:
+    label: "중복도형"
+    description: "양쪽 세대문. 마주보는 세대 동시 배출 시나리오"
+    corridor_width:
+      value: 1.8
+      confidence: confirmed
+      source: "건축물의 피난·방화구조 등의 기준에 관한 규칙 제15조의2 제1항 - 양옆에 거실이 있는 복도 1.8m 이상"
+    corridor_length:
+      value: 20.0
+      confidence: todo
+      source: "TODO(확인)"
+    unit_count:
+      value: 5
+      confidence: todo
+      source: "TODO(확인) 편측 세대수 (양측이므로 실제 세대는 2배)"
+    door_side: "both"
+    open_side: null
+    floor_material: corridor_tile
+
+  C:
+    label: "계단식(홀형)"
+    description: "엘리베이터홀 + 세대 2~4호. 복도 없음. 최신 아파트 주류"
+    hall_width:
+      value: 3.4
+      confidence: todo
+      source: "TODO(확인) 승강기 전면 활동공간 1.4m + 통행여유로 역산한 잠정값. LH 표준설계도 확인 필요"
+    hall_depth:
+      value: 4.2
+      confidence: todo
+      source: "TODO(확인) 동일"
+    unit_count:
+      value: 3
+      confidence: todo
+      source: "TODO(확인) 홀당 세대수 2~4호"
+    elevator_count:
+      value: 2
+      confidence: todo
+      source: "TODO(확인)"
+    floor_material: corridor_tile
+
+# ------------------------------------------------------- 스윕(실험) 후보값
+sweeps:
+  corridor_width:
+    values: [0.9, 1.2, 1.5, 1.8]
+    note: "0.9는 장애인등편의법 시행규칙 별표1 완화 규정(대수선 등). 1.5는 실측 중간 케이스 대비"
+  threshold_height:
+    values: [0.005, 0.010, 0.015, 0.020]
+    note: "명세 §2.2의 5~20mm 범위"
+  body_width:
+    values: [0.55, 0.60, 0.65]
+    note: "명세 Phase 3 매트릭스 - 차체폭 후보"
