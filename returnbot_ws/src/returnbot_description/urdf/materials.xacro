@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- RViz 표시용 색상. Gazebo 재질은 Phase 2에서 별도로 붙인다. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="returnbot_body">
+    <color rgba="0.85 0.87 0.90 1.0"/>
+  </material>
+
+  <material name="returnbot_wheel">
+    <color rgba="0.15 0.15 0.17 1.0"/>
+  </material>
+
+  <material name="returnbot_caster">
+    <color rgba="0.45 0.47 0.50 1.0"/>
+  </material>
+
+  <material name="returnbot_sensor">
+    <color rgba="0.10 0.45 0.70 1.0"/>
+  </material>
+
+  <material name="returnbot_camera">
+    <color rgba="0.75 0.55 0.10 1.0"/>
+  </material>
+
+</robot>

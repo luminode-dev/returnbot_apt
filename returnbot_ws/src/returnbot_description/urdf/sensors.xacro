@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+  센서 프레임.
+
+  Phase 1은 프레임과 TF만 세운다. Gazebo 센서 플러그인(스캔·IMU 발행)은
+  Phase 2에서 별도 파일로 붙인다 — 실기/시뮬 분기는 launch 인자로만 한다는
+  명세 §7 원칙에 따라 description 패키지에는 시뮬 전용 요소를 넣지 않는다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ================================================================ LiDAR ==
+       LD19: 360도, 12m, 10Hz. 차체 상부 중앙 (명세 §3).
+       360도 시야를 확보하려면 차체 최상면 위로 올라와야 한다.
+  -->
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="${body_center_x} 0 ${body_top_z + lidar_size_z/2.0}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="lidar_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_size_x/2.0}" length="${lidar_size_z}"/>
+      </geometry>
+      <material name="returnbot_sensor"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_size_x/2.0}" length="${lidar_size_z}"/>
+      </geometry>
+    </collision>
+    <xacro:inertial_cylinder mass="${lidar_mass}"
+                             radius="${lidar_size_x/2.0}" length="${lidar_size_z}">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_cylinder>
+  </link>
+
+  <!-- ================================================================== IMU ==
+       BNO085 6축. 차체 질량중심 근처에 둬야 회전 시 원심 가속도 성분이 작다.
+  -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="${body_center_x} 0 ${body_center_z}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${imu_size_x} ${imu_size_y} ${imu_size_z}"/>
+      </geometry>
+      <material name="returnbot_sensor"/>
+    </visual>
+    <xacro:inertial_box mass="${imu_mass}"
+                        x="${imu_size_x}" y="${imu_size_y}" z="${imu_size_z}">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+  <!-- =============================================================== 카메라 ==
+       전방 1개. Phase 4의 AprilTag 도킹 정렬용.
+  -->
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${body_front_x + camera_size_x/2.0} 0 ${camera_mount_height - wheel_radius}"
+            rpy="0 0 0"/>
+  </joint>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${camera_size_x} ${camera_size_y} ${camera_size_z}"/>
+      </geometry>
+      <material name="returnbot_camera"/>
+    </visual>
+    <xacro:inertial_box mass="${camera_mass}"
+                        x="${camera_size_x}" y="${camera_size_y}" z="${camera_size_z}">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+  <!-- 광학 프레임 (REP-103): z 전방, x 우측, y 하방.
+       vision 계열 노드(apriltag_ros 등)가 이 규약을 전제한다. -->
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="${-pi/2.0} 0 ${-pi/2.0}"/>
+  </joint>
+
+  <link name="camera_optical_link"/>
+
+</robot>

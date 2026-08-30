@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+  차체.
+
+  프레임 규약 (REP-105):
+      base_footprint : 바닥 투영점. 구동축 중심 바로 아래
+      base_link      : base_footprint 에서 wheel_radius 만큼 위 = 구동축 높이
+      +x 전진 / +y 좌 / +z 상방
+
+  base_link 를 구동축 중심에 두는 이유: 차동구동의 순간회전중심이 구동축 위에
+  있어서 odom/cmd_vel 계산과 제자리회전(rotate-in-place) 정책이 단순해진다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="${body_center_x} 0 ${body_center_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${body_depth} ${body_width} ${box_height}"/>
+      </geometry>
+      <material name="returnbot_body"/>
+    </visual>
+
+    <collision>
+      <origin xyz="${body_center_x} 0 ${body_center_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${body_depth} ${body_width} ${box_height}"/>
+      </geometry>
+    </collision>
+
+    <!-- 질량중심 x 는 명세 §3의 무게배분 60:40 에서 역산한 값이다
+         (robot_params.xacro 의 chassis_com_x 주석 참조). -->
+    <xacro:inertial_box mass="${chassis_mass}"
+                        x="${body_depth}" y="${body_width}" z="${box_height}">
+      <origin xyz="${body_center_x} 0 ${body_center_z}" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+</robot>

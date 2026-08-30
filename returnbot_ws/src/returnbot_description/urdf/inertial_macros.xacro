@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+  관성 텐서 매크로.
+
+  명세 Phase 1: "관성값은 xacro 매크로 계산". 관성값을 손으로 적어 넣으면
+  치수를 바꿀 때마다 틀어지고, Phase 3 매트릭스 실험(차체폭 스윕)에서
+  조용히 잘못된 물리를 쓰게 된다. 전부 치수에서 계산한다.
+
+  모든 매크로는 링크 자체 좌표계 기준이며 균질 밀도를 가정한다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- 직육면체. x=길이(depth), y=폭(width), z=높이 -->
+  <xacro:macro name="inertial_box" params="mass x y z *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (y*y + z*z) / 12.0}" ixy="0.0" ixz="0.0"
+        iyy="${mass * (x*x + z*z) / 12.0}" iyz="0.0"
+        izz="${mass * (x*x + y*y) / 12.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- 원기둥. URDF 관례대로 축은 링크의 z축이다.
+       바퀴는 조인트 origin의 rpy로 링크 전체를 돌려 y축 회전을 만든다. -->
+  <xacro:macro name="inertial_cylinder" params="mass radius length *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (3.0*radius*radius + length*length) / 12.0}" ixy="0.0" ixz="0.0"
+        iyy="${mass * (3.0*radius*radius + length*length) / 12.0}" iyz="0.0"
+        izz="${mass * radius * radius / 2.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <!-- 구 -->
+  <xacro:macro name="inertial_sphere" params="mass radius *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${2.0 * mass * radius * radius / 5.0}" ixy="0.0" ixz="0.0"
+        iyy="${2.0 * mass * radius * radius / 5.0}" iyz="0.0"
+        izz="${2.0 * mass * radius * radius / 5.0}"/>
+    </inertial>
+  </xacro:macro>
+
+</robot>

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+  구동륜 2개 (차동구동). 조향기구 없음 (명세 §3).
+
+  허브모터 + 솔리드타이어. 조인트는 continuous 이고 회전축은 링크 y축이다.
+  링크 좌표계를 조인트 origin rpy 로 -90도 돌려 원기둥(기본 z축)의 축을
+  차량 y축에 맞춘다. 관성 텐서는 링크 자체 좌표계 기준이므로 매크로를
+  그대로 쓰면 된다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- side: 'left' | 'right', reflect: +1 | -1 (좌가 +y) -->
+  <xacro:macro name="drive_wheel" params="side reflect">
+    <joint name="${side}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${side}_wheel_link"/>
+      <!-- 구동축은 base_link 원점에 있다 (x=0, z=0). -->
+      <origin xyz="0 ${reflect * wheel_separation / 2.0} 0" rpy="${-pi/2.0} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <dynamics damping="0.01" friction="0.0"/>
+    </joint>
+
+    <link name="${side}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="returnbot_wheel"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+
+      <xacro:inertial_cylinder mass="${wheel_mass}"
+                               radius="${wheel_radius}" length="${wheel_width}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:inertial_cylinder>
+    </link>
+  </xacro:macro>
+
+  <xacro:drive_wheel side="left"  reflect="1"/>
+  <xacro:drive_wheel side="right" reflect="-1"/>
+
+</robot>

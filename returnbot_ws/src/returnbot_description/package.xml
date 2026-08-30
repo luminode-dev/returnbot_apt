@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>returnbot_description</name>
+  <version>0.1.0</version>
+  <description>
+    리턴봇 URDF(xacro) 모델. 차동구동 2륜 + 후방 캐스터 2, 총 60kg, LiDAR/IMU/카메라.
+    시뮬 전용 요소(Gazebo 플러그인)는 넣지 않는다 — 실기와 공용하는 순수 기술 모델이다.
+  </description>
+  <maintainer email="luminode00@gmail.com">luminode</maintainer>
+
+  <!-- TODO(확인): 저장소 라이선스가 아직 정해지지 않았다. LICENSE 파일 추가 시 함께 갱신할 것. -->
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>liburdfdom-tools</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+  리턴봇 — 아파트 공용부 분리수거함 회수 로봇 (명세 §3).
+
+  차동구동 2륜 + 후방 캐스터 2, 총 60kg, LiDAR/IMU/카메라.
+
+  렌더링:
+      xacro returnbot.urdf.xacro > returnbot.urdf
+      xacro returnbot.urdf.xacro body_width:=0.65 wheel_separation:=0.5 > wide.urdf
+
+  노출 인자는 robot_params.xacro 참조. Phase 3 차체폭 매트릭스 실험
+  (550/600/650)이 이 인자만 바꿔서 돌아가야 한다.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="returnbot">
+
+  <xacro:include filename="$(find returnbot_description)/urdf/robot_params.xacro"/>
+  <xacro:include filename="$(find returnbot_description)/urdf/inertial_macros.xacro"/>
+  <xacro:include filename="$(find returnbot_description)/urdf/materials.xacro"/>
+
+  <xacro:include filename="$(find returnbot_description)/urdf/base.xacro"/>
+  <xacro:include filename="$(find returnbot_description)/urdf/wheels.xacro"/>
+  <xacro:include filename="$(find returnbot_description)/urdf/casters.xacro"/>
+  <xacro:include filename="$(find returnbot_description)/urdf/sensors.xacro"/>
+
+</robot>
