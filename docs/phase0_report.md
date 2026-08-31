@@ -12,7 +12,8 @@
 | 파라메트릭 월드 생성기 골격 | 완료 | [returnbot_env](../returnbot_ws/src/returnbot_env/) |
 | 인자만 바꿔 3유형 생성 | 완료 | `python -m returnbot_env.cli --all` |
 | 동일 소스에서 SDF + USD | **부분** | 공용 IR + SDF 완료, USD는 인터페이스만 (아래 참조) |
-| 스크린샷 docs 저장 | **대체 충족** | Gazebo 실행 불가 → SVG 평면도 5종 커밋 |
+| Gazebo 실제 로드 | **완료 (2026-08-31 추가 검증)** | 3유형 모두 Fortress 헤드리스 서버에서 200스텝 시뮬 통과 |
+| 스크린샷 docs 저장 | **대체 충족** | SVG 평면도 5종 커밋. 치수 주기가 들어가 Gazebo 스크린샷보다 검증에 낫다 |
 
 ## 산출물
 
@@ -49,8 +50,9 @@ EnvParams ──▶ builders/(A·B·C) ──▶ ir.Scene ──┬─▶ backen
 근사하지 않고 실제 형상으로 만들었다.
 
 **Gazebo 계열 이중화**: `--flavor fortress|harmonic`. 명세 §4는 `gz sim` 표기지만 ROS 2 Humble의
-tier-1 페어링은 Fortress(`ign gazebo`)이고 시스템 플러그인 이름이 다르다. 최종 결정은 WSL
-환경 구축 후 `env_reference.md` §6에 기록한다.
+tier-1 페어링은 Fortress(`ign gazebo`)이고 시스템 플러그인 이름이 다르다.
+**2026-08-31 Fortress(Gazebo Sim 6.18.0)로 확정**했고 근거는 `env_reference.md` §6에 기록했다.
+Harmonic 전환 경로는 그대로 남겨 뒀다.
 
 ## 검증
 
@@ -82,8 +84,9 @@ Gazebo 없이 확인 가능한 것만 다뤘다:
 - **USD 백엔드 미구현**. Isaac Sim이 없는 상태에서 만든 USD는 로드 검증이 불가능해
   "돌아가는지 모르는 코드"가 된다. IR 계약을 `backends/usd.py` docstring에 고정해 두고
   Phase 4로 이월했다
-- **Gazebo 실행 검증 없음**. SDF가 유효한 XML이고 구조가 맞다는 것까지만 확인했다.
-  실제 로드·물리 거동은 Phase 2에서 확인한다
+- ~~Gazebo 실행 검증 없음~~ → **해소됨 (2026-08-31)**. Gazebo Fortress 6.18.0 헤드리스
+  서버에서 3유형 월드가 모두 로드되어 200스텝 시뮬레이션까지 돌았다.
+  주행 거동·마찰 튜닝은 여전히 Phase 2 몫이다
 - **동적 장애물(보행자) 없음**. 명세 §2.2의 "동적/정적 랜덤 배치" 중 정적만 구현
 - **텍스처 없음**. 명세 §2.3에 따라 Phase 0~3은 콜리전 정확도 우선
 
@@ -104,11 +107,11 @@ Gazebo 없이 확인 가능한 것만 다뤘다:
    **「건축물의 피난·방화구조 등의 기준에 관한 규칙」 제15조의2 제1항**이다. 수치는 맞다
 2. **§2.2 승강기 문 폭** — `0.9 m TODO(확인)`으로 뒀으나 법정 최소는 **0.8 m**이고 0.9 m는
    신축 기준이다. 로봇 승강기 진입 시나리오에서 0.8 m가 최악 조건이므로 기본값을 0.8로 뒀다
-3. **§4 Gazebo 표기** — `gz sim`은 Garden/Harmonic 계열 명령어다. Fortress로 확정되면
-   `ign gazebo`로 수정 필요
+3. **§4 Gazebo 표기** — `gz sim`은 Garden/Harmonic 계열 명령어다. **Fortress로 확정됐으므로
+   `ign gazebo`로 수정 필요** (2026-08-31 실측: Gazebo Sim 6.18.0 / ros-humble-ros-gz 0.244.25)
 
 ## 다음 단계
 
-- Phase 1: URDF 모델링 (작성 완료, 검증은 WSL 구축 후)
-- WSL2 + Ubuntu 22.04 + ROS 2 Humble 환경 구축 → Gazebo 계열 확정
-- Phase 2에서 이 월드들을 실제로 로드해 SDF 유효성을 최종 확인
+- ~~WSL2 + ROS 2 Humble 환경 구축~~ → 완료 (2026-08-31)
+- ~~월드 실제 로드 확인~~ → 완료 (2026-08-31)
+- Phase 2: Gazebo 플러그인 부착(diff_drive/LiDAR/IMU), 텔레옵 주행, slam_toolbox 맵핑

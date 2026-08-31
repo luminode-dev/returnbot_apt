@@ -94,7 +94,12 @@ python -m pytest tests -q      # ROS 없이도 동작
 - `body_width`/`wheel_separation` 인자가 비주얼·콜리전 양쪽에 반영되는지
 - xacro 기본값이 `robot_dimensions.yaml`과 동기화되어 있는지
 
-## 남은 검증 (ROS 환경 필요)
+### ROS 2 실환경 (2026-08-31 완료)
 
-- [ ] `check_urdf` 통과 확인 (이중 검증)
-- [ ] `ros2 launch ... display.launch.py` → RViz2에서 TF 트리 육안 확인
+- [x] `check_urdf` 통과 — base_footprint 루트, 9개 자식 링크 트리 정상
+- [x] `body_width` 0.55/0.60/0.65 재렌더 + `check_urdf` 통과
+- [x] `display.launch.py` 기동 → `tf2_echo` 로 9개 프레임 전부 확인.
+      순수 파이썬 순기구학 예측치와 소수점 셋째 자리까지 일치
+- [x] RViz2 WSLg 기동 (OpenGL 4.2)
+
+`bash scripts/verify_phase1.sh` 로 전부 재현된다.

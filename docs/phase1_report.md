@@ -11,9 +11,9 @@
 | xacro: base_link, 구동륜 2(continuous), 캐스터 2, lidar/imu/camera_link | 완료 | |
 | 관성값 xacro 매크로 계산 (60 kg, 60:40 배분) | 완료 | 상수 하드코딩 없음 |
 | 치수 전부 인자화 | 완료 | 7개 인자 노출 + yaml 원본 |
-| robot_state_publisher + RViz2 launch | 완료 | 실행 확인은 ROS 환경 필요 |
-| `check_urdf` 통과 | **동등 검증 완료, 명령 실행은 보류** | 아래 참조 |
-| TF 정상 | **동등 검증 완료, RViz 확인은 보류** | 아래 참조 |
+| robot_state_publisher + RViz2 launch | 완료 | 2026-08-31 실행 확인 |
+| `check_urdf` 통과 | **완료** | 2026-08-31 ROS 2 Humble에서 실행 |
+| TF 정상 | **완료** | 2026-08-31 tf2_echo 로 9개 프레임 전부 확인 |
 | 바퀴간격·차체폭 인자 노출 | 완료 | 3값씩 스윕 검증 |
 
 ## 산출물
@@ -65,6 +65,8 @@ rotate-in-place 정책이 단순해진다.
 
 ## 검증
 
+### 1차 — ROS 없이 (2026-08-30)
+
 ```
 $ python -m pytest tests -q
 51 passed
@@ -83,8 +85,41 @@ $ python -m pytest tests -q
   **비주얼과 콜리전 양쪽** 확인
 - xacro 기본값이 `robot_dimensions.yaml`과 동기화되어 있는지 (23개 치수)
 
-### 검증 중 잡은 결함 1건
-**무게배분이 60:40이 아니라 62.8:37.2였다.** 차체 질량중심 계산에서 바퀴·캐스터만
+### 2차 — ROS 2 Humble 실환경 (2026-08-31)
+
+`scripts/verify_phase1.sh` 로 자동화했다. 전부 통과:
+
+```
+colcon build            OK
+check_urdf              OK   (base_footprint 루트, 9개 자식 링크 트리 정상)
+body_width 0.55/0.60/0.65 재렌더 + check_urdf   OK
+colcon test             107 tests, 0 errors, 0 failures
+```
+
+**TF 실측값** (`display.launch.py gui:=false rviz:=false` + `tf2_echo`):
+
+| 프레임 | base_footprint 기준 [m] |
+|---|---|
+| base_link | 0.000, 0.000, 0.100 |
+| left/right_wheel_link | 0.000, ±0.225, 0.100 |
+| left/right_caster_link | −0.400, ±0.200, 0.050 |
+| lidar_link | −0.168, 0.000, 0.420 |
+| imu_link | −0.168, 0.000, 0.220 |
+| camera_link / _optical | 0.197, 0.000, 0.300 |
+
+Windows에서 순수 파이썬 순기구학으로 계산한 값과 **소수점 셋째 자리까지 일치**한다.
+접지 조건(구동륜 z=0.100=바퀴반경, 캐스터 z=0.050=캐스터반경)도 그대로 확인된다.
+
+RViz2는 WSLg에서 OpenGL 4.2로 정상 기동한다 (Phase 2 Gazebo GUI 전제조건).
+
+### 검증 중 잡은 결함 2건
+
+**1. `gui:=false` 일 때 구동륜 TF가 아예 발행되지 않았다.** launch 파일이 joint_states
+소스로 `joint_state_publisher_gui` 만 두고 있어서, GUI를 끄면 continuous 조인트인
+구동륜의 변환이 사라졌다. 비GUI `joint_state_publisher` 폴백과 `joint_state_publisher:=false`
+인자를 추가했다 (Phase 2에서는 Gazebo가 joint_states 를 발행하므로 끈다).
+
+**2. 무게배분이 60:40이 아니라 62.8:37.2였다.** 차체 질량중심 계산에서 바퀴·캐스터만
 고려하고 전방 카메라(0.08 kg, 차체 중심에서 +0.365 m)를 빠뜨렸다. 명세 §3의 핵심
 사양이라 눈에 잘 띄지 않는 채로 Phase 2~3 전체에 영향을 줄 수 있었다.
 
@@ -94,10 +129,7 @@ $ python -m pytest tests -q
   명세 §1 검증항목 3 "피벗턴 시 캐스터 저항에 의한 경로 밀림"이 **현재 모델로는
   재현되지 않는다.** 등가 마찰계수로 크기만 흉내낸다. 명세 §8 리스크대로 Phase 4에서
   조인트 기반 상세화 검토
-- **`check_urdf` / RViz 실행 미확인.** ROS 2 환경이 없어 명령 자체는 돌리지 못했다.
-  WSL 구축 직후 최우선으로 확인할 것
-- **launch 파일 실행 미확인.** 문법 오류는 없으나 `Command` 치환과
-  `ament_index_python` 경로 해석은 실제 실행에서만 확인된다
+- ~~`check_urdf` / RViz / launch 실행 미확인~~ → **해소됨 (2026-08-31)**
 - 메시 없음 (전부 기본 도형). 명세 §2.3의 Phase 0~3 원칙에 맞다
 
 ## TODO(확인) — 명세에도 없어 임의 설정한 값
@@ -115,7 +147,8 @@ $ python -m pytest tests -q
 
 ## 다음 단계
 
-1. WSL2 + Ubuntu 22.04 + ROS 2 Humble 구축
-2. `check_urdf` / RViz TF 확인으로 이 리포트의 "보류" 항목 해소
-3. Gazebo 계열(Fortress vs Harmonic) 확정 → `docs/env_reference.md` §6 기록
-4. Phase 2: Gazebo 플러그인 부착, Phase 0 월드에서 텔레옵 주행 + slam_toolbox 맵핑
+1. ~~WSL2 + ROS 2 Humble 구축~~ → 완료 (2026-08-31, `scripts/wsl_bootstrap.sh`)
+2. ~~`check_urdf` / TF 확인~~ → 완료 (2026-08-31, `scripts/verify_phase1.sh`)
+3. ~~Gazebo 계열 확정~~ → Fortress 6.18.0 (`docs/env_reference.md` §6 기록)
+4. Phase 2: Gazebo 플러그인(diff_drive/LiDAR/IMU) 부착 → 표준 토픽(/cmd_vel /scan /odom)
+   → Phase 0 월드에서 텔레옵 주행 → slam_toolbox 맵핑

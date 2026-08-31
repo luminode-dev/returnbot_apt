@@ -1,7 +1,16 @@
 # WSL2 + ROS 2 Humble 환경 구축
 
-Phase 2 이후에 필요한 실행 환경. **관리자 권한과 재부팅이 필요하므로 사용자가 직접
-실행해야 한다.** 각 단계의 확인 명령까지 함께 적었다.
+> **상태: 2026-08-31 구축 완료.** 아래는 재현/트러블슈팅용 참조 문서다.
+> 실제 설치는 [`scripts/wsl_bootstrap.sh`](../scripts/wsl_bootstrap.sh) 한 번으로 끝난다:
+>
+> ```bash
+> bash ~/returnbot/scripts/wsl_bootstrap.sh          # 일반 사용자 (sudo 비밀번호 1회)
+> wsl -u root bash /home/<user>/returnbot/scripts/wsl_bootstrap.sh   # 또는 root (비밀번호 없음)
+> ```
+>
+> 설치된 것: Ubuntu 22.04.5 · ROS 2 Humble Desktop · **Gazebo Fortress (Sim 6.18.0)** ·
+> CycloneDDS · slam_toolbox · Nav2 · colcon/rosdep · liburdfdom-tools.
+> WSLg 확인됨 (`DISPLAY=:0`, RViz2가 OpenGL 4.2로 기동).
 
 전제: Windows 11 (WSLg가 GUI를 기본 제공 → 별도 X 서버 불필요).
 
@@ -68,12 +77,14 @@ sudo apt install -y python3-colcon-common-extensions python3-rosdep
 sudo rosdep init && rosdep update
 ```
 
-## 5. Gazebo — **버전 결정이 필요한 지점**
+## 5. Gazebo — **Fortress로 확정됨 (2026-08-31)**
 
 명세 §4는 `gz sim` 표기지만, ROS 2 Humble의 tier-1 페어링은 **Fortress**(`ign gazebo`)다.
-시스템 플러그인 이름이 달라서 월드 생성기가 `--flavor` 인자로 둘을 지원하고 있다.
+apt 실측 결과 `ros-humble-ros-gz` 0.244.25 가 Fortress(Gazebo Sim 6.18.0)를 끌어왔다.
+**명세 §4의 `gz sim` 표기는 `ign gazebo` 로 정정이 필요하다.**
+월드 생성기는 `--flavor harmonic` 전환 경로를 그대로 유지하고 있다.
 
-먼저 apt에 무엇이 있는지 **실제로 확인**한다:
+확인 방법:
 
 ```bash
 apt-cache policy ros-humble-ros-gz            # Fortress 연동
@@ -132,9 +143,14 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
-## 9. 보류 중인 Phase 1 검증 해소
+## 9. Phase 0/1 검증 — `scripts/verify_phase1.sh` 로 자동화됨
 
-환경이 서면 **가장 먼저** 이것부터 확인한다 (`docs/phase1_report.md`의 "보류" 항목):
+```bash
+bash ~/returnbot/scripts/verify_phase1.sh
+```
+
+빌드 → `check_urdf` → 인자 스윕 재렌더 → `colcon test` → TF 9프레임 → Gazebo 월드
+3유형 로드까지 GUI 없이 한 번에 돈다. 개별로 돌리려면:
 
 ```bash
 # check_urdf

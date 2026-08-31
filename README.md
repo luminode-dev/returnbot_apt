@@ -10,15 +10,24 @@
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| 0 | 환경 기준 정리 + 파라메트릭 월드 생성기 | **완료** — [리포트](docs/phase0_report.md) |
-| 1 | URDF 모델링 | **완료** (ROS 실행 검증 보류) — [리포트](docs/phase1_report.md) |
+| 0 | 환경 기준 정리 + 파라메트릭 월드 생성기 | **완료 · Gazebo 로드 검증됨** — [리포트](docs/phase0_report.md) |
+| 1 | URDF 모델링 | **완료 · check_urdf + TF 검증됨** — [리포트](docs/phase1_report.md) |
 | 2 | Gazebo 주행 검증 + SLAM | 미착수 |
 | 3 | Nav2 자율주행 + 차체폭 매트릭스 | 미착수 |
 | 4 | Isaac Sim 트윈 + AprilTag 도킹 | 미착수 |
 
-> **ROS 2 환경이 아직 없다.** Phase 0·1은 순수 파이썬으로 작성·검증했다.
-> `check_urdf`, RViz, Gazebo 실행 확인은 WSL2 + Ubuntu 22.04 구축 후로 보류 중이다.
-> 구축 절차는 [환경 구축](#환경-구축) 참조.
+**환경**: WSL2 + Ubuntu 22.04.5 · ROS 2 Humble · Gazebo Fortress (Sim 6.18.0) · CycloneDDS.
+`scripts/wsl_bootstrap.sh` 한 번으로 재현된다.
+
+```
+$ bash scripts/verify_phase1.sh
+colcon build                                   OK
+check_urdf                                     OK
+body_width 0.55/0.60/0.65 재렌더 + check_urdf   OK
+colcon test              107 tests, 0 errors, 0 failures
+TF 9개 프레임 전부 확인                          OK
+Gazebo 월드 3유형 200스텝 시뮬                   OK
+```
 
 ## 저장소 구조
 
@@ -38,9 +47,23 @@ returnbot_ws/src/
 └── returnbot_docking/      # AprilTag 도킹 — Phase 4
 ```
 
-## 지금 바로 돌려볼 수 있는 것
+## 실행
 
-ROS 2 없이 Python 3만 있으면 된다 (`pip install pyyaml pytest xacro`).
+### WSL / ROS 2 환경
+
+```bash
+cd ~/returnbot/returnbot_ws && source install/setup.bash
+
+ros2 launch returnbot_description display.launch.py                    # RViz로 로봇 확인
+ros2 launch returnbot_description display.launch.py body_width:=0.65   # 인자 스윕
+ign gazebo ~/returnbot/returnbot_ws/src/returnbot_env/worlds/apt_type_a.sdf
+
+bash ~/returnbot/scripts/verify_phase1.sh                              # 전체 검증
+```
+
+### ROS 없이 (Windows에서도)
+
+Python 3만 있으면 된다 (`pip install pyyaml pytest xacro`).
 
 ```bash
 # 아파트 월드 3유형 생성 + 평면도
@@ -68,11 +91,21 @@ python -m pytest tests -q                   # 51 passed
 
 ## 환경 구축
 
-Phase 2 이후는 ROS 2 Humble이 필요하고, Humble은 **Ubuntu 22.04(Jammy)** 전용이다.
-개발 PC가 Windows이므로 WSL2에 Ubuntu 22.04를 올린다. Windows 11의 WSLg가 GUI를
-기본 제공하므로 Gazebo·RViz에 별도 X 서버가 필요 없다.
+ROS 2 Humble은 **Ubuntu 22.04(Jammy)** 전용이다. 개발 PC가 Windows이므로 WSL2에
+Ubuntu 22.04를 올린다. Windows 11의 WSLg가 GUI를 제공하므로 별도 X 서버가 필요 없다
+(RViz2가 OpenGL 4.2로 기동하는 것까지 확인).
 
-절차는 [`docs/wsl_setup.md`](docs/wsl_setup.md) 참조.
+```powershell
+wsl --install -d Ubuntu-22.04     # 관리자 PowerShell, 이후 재부팅
+```
+
+```bash
+git clone https://github.com/luminode-dev/returnbot_apt.git ~/returnbot
+bash ~/returnbot/scripts/wsl_bootstrap.sh
+```
+
+`/mnt/c` 에서 colcon 빌드하지 말 것 — 느리고 퍼미션 문제가 있다. 상세 절차와 함정은
+[`docs/wsl_setup.md`](docs/wsl_setup.md) 참조.
 
 ## 근거 문서
 

@@ -111,8 +111,9 @@
 |---|---|---|
 | ROS 2 | Humble Hawksbill | 명세 §4. Ubuntu 22.04(Jammy) 필수 |
 | DDS | CycloneDDS 고정 | 명세 §4 |
-| Gazebo | **TODO(확인)** — Fortress(`ign gazebo`) vs Harmonic(`gz sim`) | 명세 §4는 `gz sim` 표기이나 Humble의 tier-1 페어링은 Fortress다. WSL 구축 시 apt 가용성 확인 후 이 표에 확정 기록 |
-| 실행 환경 | WSL2 + Ubuntu 22.04 (Windows 11 호스트) | 개발 PC가 Windows. WSLg가 GUI를 기본 제공하므로 별도 X 서버 불필요 |
+| Gazebo | **Fortress 확정** — `ign gazebo`, Gazebo Sim 6.18.0 | 2026-08-31 실측. `ros-humble-ros-gz` 0.244.25 가 apt에 있고 Fortress를 끌어온다. **명세 §4의 `gz sim` 표기는 Garden/Harmonic 계열 명령어이므로 `ign gazebo` 로 정정 필요.** 생성기는 `--flavor harmonic` 으로 전환 가능하게 남겨 뒀다 |
+| 실행 환경 | WSL2 + Ubuntu 22.04.5 (Windows 11 호스트) | 개발 PC가 Windows. WSLg 확인됨 (`DISPLAY=:0`, Wayland, RViz2가 OpenGL 4.2로 기동) — 별도 X 서버 불필요 |
+| 환경 구축 | [`scripts/wsl_bootstrap.sh`](../scripts/wsl_bootstrap.sh) | 재현 가능하도록 스크립트화. 여러 번 돌려도 안전 |
 
 ---
 
