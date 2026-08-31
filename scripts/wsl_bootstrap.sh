@@ -38,8 +38,11 @@ if [ "${UBUNTU_CODENAME:-}" != "jammy" ]; then
 fi
 echo "  ${PRETTY_NAME}"
 
+# root면 빈 접두사, 아니면 sudo. 배열로 두는 이유: 빈 문자열을 명령줄에 그대로
+# 남기면 뒤따르는 -E 가 명령 이름으로 해석되어 "-E: command not found" 가 난다.
 if [ "$(id -u)" -eq 0 ]; then
-  SUDO=""
+  SUDO=()
+  SUDO_E=(env)
   TARGET_USER="${RETURNBOT_USER:-}"
   if [ -z "${TARGET_USER}" ]; then
     # /home 아래 계정이 정확히 하나면 그 계정으로 본다.
@@ -50,7 +53,8 @@ if [ "$(id -u)" -eq 0 ]; then
   id "${TARGET_USER}" >/dev/null 2>&1 || die "사용자 ${TARGET_USER} 가 없다"
   echo "  root로 실행 중 · 대상 사용자: ${TARGET_USER}"
 else
-  SUDO="sudo"
+  SUDO=(sudo)
+  SUDO_E=(sudo -E)
   TARGET_USER="$(whoami)"
   echo "  사용자: ${TARGET_USER}"
   log "sudo 자격 확인 (비밀번호를 한 번 묻는다)"
@@ -72,8 +76,8 @@ as_user() {
 }
 
 export DEBIAN_FRONTEND=noninteractive
-apt_install() { ${SUDO} -E apt-get install -y --no-install-recommends "$@"; }
-apt_update()  { ${SUDO} -E apt-get update; }
+apt_install() { "${SUDO_E[@]}" apt-get install -y --no-install-recommends "$@"; }
+apt_update()  { "${SUDO_E[@]}" apt-get update; }
 
 # ------------------------------------------------------------------ 기본 도구
 log "기본 패키지"
@@ -83,13 +87,13 @@ apt_install curl gnupg2 ca-certificates lsb-release software-properties-common \
 
 # ------------------------------------------------------------- ROS 2 apt 저장소
 log "ROS 2 apt 저장소 등록"
-${SUDO} add-apt-repository -y universe
+"${SUDO[@]}" add-apt-repository -y universe
 if [ ! -s /usr/share/keyrings/ros-archive-keyring.gpg ]; then
-  ${SUDO} curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+  "${SUDO[@]}" curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
     -o /usr/share/keyrings/ros-archive-keyring.gpg
 fi
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu ${UBUNTU_CODENAME} main" \
-  | ${SUDO} tee /etc/apt/sources.list.d/ros2.list > /dev/null
+  | "${SUDO[@]}" tee /etc/apt/sources.list.d/ros2.list > /dev/null
 apt_update
 
 # ------------------------------------------------------------------ ROS 2 본체
@@ -117,10 +121,10 @@ case "${GAZEBO_FLAVOR}" in
     ;;
   harmonic)
     log "Gazebo Harmonic 설치 (gz sim) — OSRF 저장소 추가"
-    ${SUDO} curl -fsSL https://packages.osrfoundation.org/gazebo.gpg \
+    "${SUDO[@]}" curl -fsSL https://packages.osrfoundation.org/gazebo.gpg \
       -o /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable ${UBUNTU_CODENAME} main" \
-      | ${SUDO} tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+      | "${SUDO[@]}" tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
     apt_update
     apt_install gz-harmonic "ros-${ROS_DISTRO_NAME}-ros-gzharmonic" \
       || die "Harmonic 연동 패키지를 찾지 못했다. GAZEBO_FLAVOR=fortress 로 다시 실행할 것."
@@ -147,7 +151,7 @@ fi
 # ------------------------------------------------------------------- rosdep
 log "rosdep 초기화"
 if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
-  ${SUDO} rosdep init
+  "${SUDO[@]}" rosdep init
 fi
 # root로 돌리면 ~/.ros 소유권이 root가 되어 이후 사용자 실행이 깨진다.
 as_user rosdep update
