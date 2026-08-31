@@ -17,7 +17,12 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.conditions import IfCondition
-from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    PythonExpression,
+)
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -63,10 +68,28 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             parameters=[{"robot_description": robot_description}],
         ),
+        # 구동륜은 continuous 조인트라 joint_states 가 없으면 바퀴 TF가 발행되지 않는다.
+        # gui:=false 일 때도 헤드리스 검증이 되도록 비GUI 퍼블리셔로 폴백한다.
+        # Phase 2에서 Gazebo가 joint_states 를 발행하면 joint_state_publisher:=false 로 끈다.
         Node(
             package="joint_state_publisher_gui",
             executable="joint_state_publisher_gui",
-            condition=IfCondition(LaunchConfiguration("gui")),
+            condition=IfCondition(
+                PythonExpression([
+                    "'", LaunchConfiguration("joint_state_publisher"), "' == 'true' and ",
+                    "'", LaunchConfiguration("gui"), "' == 'true'",
+                ])
+            ),
+        ),
+        Node(
+            package="joint_state_publisher",
+            executable="joint_state_publisher",
+            condition=IfCondition(
+                PythonExpression([
+                    "'", LaunchConfiguration("joint_state_publisher"), "' == 'true' and ",
+                    "'", LaunchConfiguration("gui"), "' != 'true'",
+                ])
+            ),
         ),
         Node(
             package="rviz2",
@@ -91,7 +114,10 @@ def generate_launch_description() -> LaunchDescription:
     ]
     declarations += [
         DeclareLaunchArgument("gui", default_value="true",
-                              description="joint_state_publisher_gui 실행 여부"),
+                              description="joint_state_publisher 를 GUI 버전으로 띄울지 여부"),
+        DeclareLaunchArgument("joint_state_publisher", default_value="true",
+                              description="joint_states 퍼블리셔 실행 여부. "
+                                          "Gazebo가 joint_states 를 발행하는 Phase 2에서는 false"),
         DeclareLaunchArgument("rviz", default_value="true", description="RViz2 실행 여부"),
     ]
 
