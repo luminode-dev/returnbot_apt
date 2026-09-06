@@ -35,6 +35,7 @@ def generate_launch_description() -> LaunchDescription:
             "software_rendering": LaunchConfiguration("software_rendering"),
             "render_engine": LaunchConfiguration("render_engine"),
             "fire_door": LaunchConfiguration("fire_door"),
+            "clutter": LaunchConfiguration("clutter"),
         }.items(),
     )
 
@@ -64,6 +65,9 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("fire_door", default_value="closed",
                               choices=["closed", "open"],
                               description="방화문 상태. 기준 맵은 closed 로 만든다"),
+        DeclareLaunchArgument("clutter", default_value="false",
+                              choices=["true", "false"],
+                              description="적치물 배치 여부. 기준 맵은 구조물만 담는다"),
         gazebo,
         slam,
     ])

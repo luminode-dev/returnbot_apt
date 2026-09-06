@@ -53,14 +53,16 @@ def spawn_pose(apt_type: str) -> dict:
         return yaml.safe_load(fh)[apt_type.upper()]
 
 
-def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool) -> Path:
+def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool, clutter: bool) -> Path:
     """월드 SDF를 returnbot_env 생성기로 만든다.
 
     worlds/*.sdf 는 .gitignore 대상(생성 산출물)이라 클론 직후에는 없다.
-    방화문 상태에 따라 지오메트리가 달라지므로 파일명에 상태를 넣고, 없을 때만 만든다.
+    인자에 따라 지오메트리가 달라지므로 파일명에 상태를 넣어 섞이지 않게 한다.
     """
-    suffix = "_fdclosed" if fire_door_closed else "_fdopen"
-    name = f"apt_type_{apt_type.lower()}{suffix}"
+    parts = [f"apt_type_{apt_type.lower()}",
+             "fdclosed" if fire_door_closed else "fdopen",
+             "clutter" if clutter else "noclutter"]
+    name = "_".join(parts)
     world = world_dir / f"{name}.sdf"
     if world.exists():
         return world
@@ -70,6 +72,8 @@ def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool) -> Path
            "--name", name, "--out", str(world_dir)]
     if fire_door_closed:
         cmd.append("--fire-door-closed")
+    if not clutter:
+        cmd.append("--no-clutter")
     subprocess.run(cmd, check=True)
     return world
 
@@ -80,8 +84,10 @@ def launch_setup(context, *args, **kwargs):
 
     sim_share = Path(get_package_share_directory(SIM_PKG))
     fire_door_closed = LaunchConfiguration("fire_door").perform(context) == "closed"
+    clutter = LaunchConfiguration("clutter").perform(context).lower() == "true"
     world = ensure_world(
-        apt_type, Path(LaunchConfiguration("world_dir").perform(context)), fire_door_closed
+        apt_type, Path(LaunchConfiguration("world_dir").perform(context)),
+        fire_door_closed, clutter,
     )
     pose = spawn_pose(apt_type)
 
@@ -189,6 +195,13 @@ def generate_launch_description() -> LaunchDescription:
                                           "LiDAR 광선이 새어나가 맵에 부채꼴 허위 자유공간이 "
                                           "생긴다. 문 너머 계단실을 월드에 만들기 전까지는 "
                                           "닫힌 상태가 기준 맵에 맞다"),
+        DeclareLaunchArgument("clutter", default_value="false",
+                              choices=["true", "false"],
+                              description="세대 앞 적치물 배치 여부. 기본이 false 인 이유: "
+                                          "기준 맵에는 구조물만 들어가야 한다. 적치물은 "
+                                          "이동 가능한 물체라 Nav2 코스트맵의 동적 장애물로 "
+                                          "다루는 것이 맞고, 맵에 구워 넣으면 안 된다. "
+                                          "적치물 시나리오는 Phase 3 평가 주행에서 켠다"),
         DeclareLaunchArgument("world_dir", default_value=default_world_dir,
                               description="월드 SDF 디렉터리. 없으면 생성기가 만든다"),
     ]
