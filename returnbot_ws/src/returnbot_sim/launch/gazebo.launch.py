@@ -53,15 +53,27 @@ def spawn_pose(apt_type: str) -> dict:
         return yaml.safe_load(fh)[apt_type.upper()]
 
 
-def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool, clutter: bool) -> Path:
+def ensure_world(
+    apt_type: str,
+    world_dir: Path,
+    fire_door_closed: bool,
+    clutter: bool,
+    ramp_grade: float,
+    threshold: float,
+) -> Path:
     """월드 SDF를 returnbot_env 생성기로 만든다.
 
     worlds/*.sdf 는 .gitignore 대상(생성 산출물)이라 클론 직후에는 없다.
-    인자에 따라 지오메트리가 달라지므로 파일명에 상태를 넣어 섞이지 않게 한다.
+    인자에 따라 지오메트리가 달라지므로 파일명에 전 조건을 인코딩해 섞이지 않게 한다.
+    (명세 Phase 2: "월드 3종 x 문턱 15 mm x 경사로 8% 구성")
     """
-    parts = [f"apt_type_{apt_type.lower()}",
-             "fdclosed" if fire_door_closed else "fdopen",
-             "clutter" if clutter else "noclutter"]
+    parts = [
+        f"apt_type_{apt_type.lower()}",
+        "fdclosed" if fire_door_closed else "fdopen",
+        "clutter" if clutter else "noclutter",
+        f"r{round(ramp_grade * 1000):03d}",   # 경사로 구배 x1000 (0.08 -> r080)
+        f"t{round(threshold * 1000):03d}",    # 문턱 높이 mm (0.015 -> t015)
+    ]
     name = "_".join(parts)
     world = world_dir / f"{name}.sdf"
     if world.exists():
@@ -69,7 +81,8 @@ def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool, clutter
     world_dir.mkdir(parents=True, exist_ok=True)
     cmd = [sys.executable, "-m", "returnbot_env.cli",
            "--type", apt_type.upper(), "--flavor", "fortress",
-           "--name", name, "--out", str(world_dir)]
+           "--name", name, "--out", str(world_dir),
+           "--ramp-grade", str(ramp_grade), "--threshold", str(threshold)]
     if fire_door_closed:
         cmd.append("--fire-door-closed")
     if not clutter:
@@ -88,6 +101,8 @@ def launch_setup(context, *args, **kwargs):
     world = ensure_world(
         apt_type, Path(LaunchConfiguration("world_dir").perform(context)),
         fire_door_closed, clutter,
+        float(LaunchConfiguration("ramp_grade").perform(context)),
+        float(LaunchConfiguration("threshold").perform(context)),
     )
     pose = spawn_pose(apt_type)
 
@@ -202,6 +217,11 @@ def generate_launch_description() -> LaunchDescription:
                                           "이동 가능한 물체라 Nav2 코스트맵의 동적 장애물로 "
                                           "다루는 것이 맞고, 맵에 구워 넣으면 안 된다. "
                                           "적치물 시나리오는 Phase 3 평가 주행에서 켠다"),
+        DeclareLaunchArgument("ramp_grade", default_value="0.08",
+                              description="복도 경사로 구배 (명세 §2.2의 8%). "
+                                          "0 이면 경사로 없는 평탄 복도"),
+        DeclareLaunchArgument("threshold", default_value="0.015",
+                              description="세대문 앞 문턱 높이 [m] (명세 §2.2의 15 mm 기본)"),
         DeclareLaunchArgument("world_dir", default_value=default_world_dir,
                               description="월드 SDF 디렉터리. 없으면 생성기가 만든다"),
     ]

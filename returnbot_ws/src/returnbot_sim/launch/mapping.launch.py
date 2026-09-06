@@ -36,6 +36,8 @@ def generate_launch_description() -> LaunchDescription:
             "render_engine": LaunchConfiguration("render_engine"),
             "fire_door": LaunchConfiguration("fire_door"),
             "clutter": LaunchConfiguration("clutter"),
+            "ramp_grade": LaunchConfiguration("ramp_grade"),
+            "threshold": LaunchConfiguration("threshold"),
         }.items(),
     )
 
@@ -68,6 +70,10 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("clutter", default_value="false",
                               choices=["true", "false"],
                               description="적치물 배치 여부. 기준 맵은 구조물만 담는다"),
+        DeclareLaunchArgument("ramp_grade", default_value="0.08",
+                              description="경사로 구배. 0 이면 평탄 복도"),
+        DeclareLaunchArgument("threshold", default_value="0.015",
+                              description="문턱 높이 [m]"),
         gazebo,
         slam,
     ])
