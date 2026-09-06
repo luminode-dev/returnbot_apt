@@ -82,8 +82,9 @@ with open(path, 'rb') as fh:
     w, h = (int(v) for v in line.split())
     fh.readline()
     data = fh.read()
+# map_saver 규약: 0 = 점유, 254 = 자유, 205 = 미지
 occupied = sum(1 for b in data if b < 100)
-free = sum(1 for b in data if b > 200)
+free = sum(1 for b in data if b > 250)
 unknown = len(data) - occupied - free
 print(f"  맵 {w}x{h}  점유={occupied}  자유={free}  미지={unknown}")
 PY

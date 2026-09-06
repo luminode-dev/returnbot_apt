@@ -13,6 +13,7 @@
 
 import math
 import sys
+import time
 
 import rclpy
 from geometry_msgs.msg import Twist
@@ -80,9 +81,30 @@ class MappingDriver(Node):
         """
         return self.get_clock().now().nanoseconds / 1e9
 
-    def wait_for_odom(self, timeout: float = 30.0) -> bool:
-        deadline = self._now() + timeout
-        while rclpy.ok() and self.x is None and self._now() < deadline:
+    def wait_for_clock(self, timeout: float = 60.0) -> bool:
+        """use_sim_time 이면 첫 /clock 을 받기 전까지 ROS 시계가 0 에 머문다.
+
+        그 상태에서 deadline 을 계산하면(0 + 30) 시계가 시뮬 경과시간으로 튀는 순간
+        곧바로 타임아웃 판정이 난다. 실제로 그 때문에 주행이 통째로 건너뛰어졌다.
+        여기서는 시계가 살아날 때까지 **벽시계**로 기다린다.
+        """
+        if not self.get_parameter("use_sim_time").value:
+            return True
+        started = time.monotonic()
+        while rclpy.ok() and time.monotonic() - started < timeout:
+            self._spin_once()
+            if self._now() > 0.0:
+                self._spin_once()
+                self.get_logger().info(f"시뮬 시계 동기화됨 (t={self._now():.1f}s)")
+                return True
+        self.get_logger().error("/clock 을 받지 못했다. 브릿지의 clock 매핑 확인 필요")
+        return False
+
+    def wait_for_odom(self, timeout: float = 60.0) -> bool:
+        # 벽시계 기준. 시뮬 시계는 위에서 이미 동기화했지만, 브링업 지연은
+        # 시뮬 시간이 아니라 실제 시간으로 재는 것이 맞다.
+        started = time.monotonic()
+        while rclpy.ok() and self.x is None and time.monotonic() - started < timeout:
             self._spin_once()
         if self.x is None:
             self.get_logger().error("/odom 을 받지 못했다. 브릿지와 diff_drive 플러그인 확인 필요")
@@ -145,6 +167,8 @@ class MappingDriver(Node):
 
     # --------------------------------------------------------------- 시나리오
     def run(self) -> int:
+        if not self.wait_for_clock():
+            return 1
         if not self.wait_for_odom():
             return 1
 
