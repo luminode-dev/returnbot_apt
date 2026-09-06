@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+  Gazebo용 리턴봇 = returnbot_description 모델 + 시뮬 전용 플러그인.
+
+  description 패키지는 실기와 공용하는 순수 기술 모델로 남기고(명세 §7),
+  Gazebo 태그는 여기서만 얹는다. 차체 치수 인자는 description 것을 그대로 물려받으므로
+  Phase 3 매트릭스 실험이 동일한 인자로 시뮬까지 돌아간다.
+
+    xacro returnbot_gz.urdf.xacro body_width:=0.65 > /tmp/rb.urdf
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="returnbot">
+
+  <xacro:include filename="$(find returnbot_description)/urdf/returnbot.urdf.xacro"/>
+  <xacro:include filename="$(find returnbot_sim)/urdf/gazebo_plugins.xacro"/>
+
+</robot>

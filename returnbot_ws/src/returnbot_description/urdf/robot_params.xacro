@@ -47,6 +47,10 @@
   <xacro:property name="lidar_size_y"      value="0.06"/>
   <xacro:property name="lidar_size_z"      value="0.04"/>
   <xacro:property name="lidar_mass"        value="0.2"/>
+  <!-- LD19 성능 제원 (명세 §3 확정값). Gazebo 센서 플러그인이 이 값을 그대로 쓴다. -->
+  <xacro:property name="lidar_range_max"   value="12.0"/>
+  <xacro:property name="lidar_range_min"   value="0.05"/>
+  <xacro:property name="lidar_scan_rate"   value="10.0"/>
   <xacro:property name="imu_size_x"        value="0.02"/>
   <xacro:property name="imu_size_y"        value="0.02"/>
   <xacro:property name="imu_size_z"        value="0.005"/>

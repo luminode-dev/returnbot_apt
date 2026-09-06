@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!--
+  Gazebo(Fortress) 전용 요소.
+
+  명세 §7 "실기/시뮬 분기는 launch 인자로만"에 따라 returnbot_description 에는
+  시뮬 전용 태그를 넣지 않는다. 이 파일은 returnbot_sim 에만 있고,
+  returnbot_gz.urdf.xacro 가 description 모델 위에 얹는다.
+
+  표준 토픽 네이밍 (명세 Phase 2): /cmd_vel /scan /odom
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ============================================================ 마찰 ==
+       명세 §8: 솔리드타이어 마찰과 캐스터 스위블 저항은 시뮬-실기 갭이 크다.
+       아래 값은 전부 튜닝 시작점이며 returnbot_description/config/robot_dimensions.yaml
+       의 friction 절과 같은 값이어야 한다.
+  -->
+  <xacro:macro name="wheel_surface" params="link mu">
+    <gazebo reference="${link}">
+      <mu1>${mu}</mu1>
+      <mu2>${mu}</mu2>
+      <kp>1000000.0</kp>
+      <kd>100.0</kd>
+      <minDepth>0.001</minDepth>
+      <maxVel>1.0</maxVel>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:wheel_surface link="left_wheel_link"  mu="${drive_wheel_mu}"/>
+  <xacro:wheel_surface link="right_wheel_link" mu="${drive_wheel_mu}"/>
+  <!-- 캐스터는 구형 근사다. 낮은 마찰로 스위블 저항의 '크기'만 흉내낸다.
+       회전 저항 자체는 재현되지 않는다 — returnbot_description/urdf/casters.xacro 주석 참조. -->
+  <xacro:wheel_surface link="left_caster_link"  mu="${caster_mu}"/>
+  <xacro:wheel_surface link="right_caster_link" mu="${caster_mu}"/>
+
+  <!-- ======================================================== 차동구동 ==
+       wheel_separation / wheel_radius 는 URDF와 같은 인자에서 나온다.
+       두 값이 어긋나면 odom이 조용히 틀어져 Phase 3 결과를 못 믿게 된다.
+  -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-diff-drive-system"
+            name="ignition::gazebo::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>${wheel_separation}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <!-- 명세 §3: 최고 1.0 m/s, 운용 0.6 m/s -->
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+      <min_linear_acceleration>-1.0</min_linear_acceleration>
+    </plugin>
+
+    <!-- 구동륜이 continuous 조인트라 joint_states 소스가 필요하다.
+         이게 있으면 display.launch.py 의 joint_state_publisher 는 꺼야 한다. -->
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+            name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>/joint_states</topic>
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
+
+  <!-- ============================================================ LiDAR ==
+       LD19: 360도, 12 m, 10 Hz (명세 §3).
+  -->
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <topic>/scan</topic>
+      <update_rate>${lidar_scan_rate}</update_rate>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <ignition_frame_id>lidar_link</ignition_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>${-pi}</min_angle>
+            <max_angle>${pi}</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>${lidar_range_min}</min>
+          <max>${lidar_range_max}</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <!-- TODO(확인) LD19 실측 노이즈. 데이터시트 확인 후 보정 -->
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- ============================================================== IMU == -->
+  <gazebo reference="imu_link">
+    <sensor name="imu" type="imu">
+      <topic>/imu</topic>
+      <update_rate>100</update_rate>
+      <always_on>true</always_on>
+      <ignition_frame_id>imu_link</ignition_frame_id>
+    </sensor>
+  </gazebo>
+
+  <!-- 시각화용 색상 (Gazebo는 URDF material 을 그대로 쓰지 않는다) -->
+  <gazebo reference="base_link">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+</robot>

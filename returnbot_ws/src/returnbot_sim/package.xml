@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>returnbot_sim</name>
+  <version>0.1.0</version>
+  <description>
+    시뮬레이션 전용 launch·Gazebo 플러그인. returnbot_description 의 순수 기술 모델 위에
+    Gazebo(Fortress) 태그를 얹어 띄운다. 실기에는 이 패키지를 배포하지 않는다.
+  </description>
+  <maintainer email="luminode00@gmail.com">luminode</maintainer>
+
+  <!-- TODO(확인): 저장소 라이선스 미정. LICENSE 추가 시 함께 갱신할 것. -->
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>returnbot_description</exec_depend>
+  <exec_depend>returnbot_env</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
