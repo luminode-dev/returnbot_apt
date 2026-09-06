@@ -85,7 +85,14 @@ def launch_setup(context, *args, **kwargs):
     pose = spawn_pose(apt_type)
 
     # -r: 시작하자마자 물리를 돌린다. -s: 서버만(헤드리스).
-    gz_args = f"-r {'-s ' if headless else ''}{world}"
+    #
+    # --render-engine: gpu_lidar 는 헤드리스에서도 오프스크린 렌더링을 한다. WSLg의
+    # GL3Plus 드라이버는 ogre2(ogre-next)가 쓰는 텍스처 복사를 구현하지 않아
+    # `Ogre::UnimplementedException ... GL3PlusTextureGpu::copyTo` 로 서버가 죽는다.
+    # ogre(v1) 엔진은 같은 기능을 다른 경로로 처리해 WSL에서 동작한다.
+    # 네이티브 리눅스 + 실 GPU 라면 ogre2 가 품질·성능 모두 낫다.
+    render_engine = LaunchConfiguration("render_engine").perform(context)
+    gz_args = f"-r {'-s ' if headless else ''}--render-engine {render_engine} {world}"
 
     gz = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -163,6 +170,11 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("headless", default_value="false",
                               description="true 면 Gazebo GUI 없이 서버만 실행"),
         DeclareLaunchArgument("rviz", default_value="true", description="RViz2 실행 여부"),
+        DeclareLaunchArgument("render_engine", default_value="ogre",
+                              choices=["ogre", "ogre2"],
+                              description="ign-rendering 엔진. WSL에서는 ogre2가 "
+                                          "gpu_lidar 렌더링 중 죽으므로 ogre 가 기본. "
+                                          "네이티브 GPU 환경이면 ogre2 권장"),
         DeclareLaunchArgument("world_dir", default_value=default_world_dir,
                               description="월드 SDF 디렉터리. 없으면 생성기가 만든다"),
     ]
