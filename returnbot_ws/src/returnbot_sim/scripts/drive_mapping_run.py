@@ -43,12 +43,15 @@ class MappingDriver(Node):
         self.declare_parameter("angular_speed", 0.5)
         self.declare_parameter("forward_distance", 15.0)
         self.declare_parameter("settle_seconds", 3.0)
+        # 왕복 대신 편도만. 180도 선회가 맵 아티팩트에 관여하는지 가르는 실험용.
+        self.declare_parameter("round_trip", True)
 
         self.apt_type = self.get_parameter("apt_type").value.upper()
         self.v = float(self.get_parameter("linear_speed").value)
         self.w = float(self.get_parameter("angular_speed").value)
         self.forward = float(self.get_parameter("forward_distance").value)
         self.settle = float(self.get_parameter("settle_seconds").value)
+        self.round_trip = bool(self.get_parameter("round_trip").value)
 
         self.cmd_pub = self.create_publisher(Twist, "cmd_vel", 10)
         odom_qos = QoSProfile(
@@ -191,6 +194,9 @@ class MappingDriver(Node):
         """복도 왕복. 편복도는 개방측 난간 때문에 한쪽 반사가 약해 왕복이 특히 중요하다."""
         out = self.drive_distance(self.forward)
         self.get_logger().info(f"전진 {out:.2f} m (목표 {self.forward:.2f} m)")
+        if not self.round_trip:
+            self.get_logger().info("round_trip=false — 선회·복귀 생략")
+            return
         self.rotate(math.pi)
         back = self.drive_distance(self.forward)
         self.get_logger().info(f"복귀 {back:.2f} m")
