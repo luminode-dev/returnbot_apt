@@ -53,20 +53,24 @@ def spawn_pose(apt_type: str) -> dict:
         return yaml.safe_load(fh)[apt_type.upper()]
 
 
-def ensure_world(apt_type: str, world_dir: Path) -> Path:
-    """월드 SDF가 없으면 returnbot_env 생성기로 만든다.
+def ensure_world(apt_type: str, world_dir: Path, fire_door_closed: bool) -> Path:
+    """월드 SDF를 returnbot_env 생성기로 만든다.
 
     worlds/*.sdf 는 .gitignore 대상(생성 산출물)이라 클론 직후에는 없다.
+    방화문 상태에 따라 지오메트리가 달라지므로 파일명에 상태를 넣고, 없을 때만 만든다.
     """
-    world = world_dir / f"apt_type_{apt_type.lower()}.sdf"
+    suffix = "_fdclosed" if fire_door_closed else "_fdopen"
+    name = f"apt_type_{apt_type.lower()}{suffix}"
+    world = world_dir / f"{name}.sdf"
     if world.exists():
         return world
     world_dir.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        [sys.executable, "-m", "returnbot_env.cli",
-         "--type", apt_type.upper(), "--flavor", "fortress", "--out", str(world_dir)],
-        check=True,
-    )
+    cmd = [sys.executable, "-m", "returnbot_env.cli",
+           "--type", apt_type.upper(), "--flavor", "fortress",
+           "--name", name, "--out", str(world_dir)]
+    if fire_door_closed:
+        cmd.append("--fire-door-closed")
+    subprocess.run(cmd, check=True)
     return world
 
 
@@ -75,7 +79,10 @@ def launch_setup(context, *args, **kwargs):
     headless = LaunchConfiguration("headless").perform(context).lower() == "true"
 
     sim_share = Path(get_package_share_directory(SIM_PKG))
-    world = ensure_world(apt_type, Path(LaunchConfiguration("world_dir").perform(context)))
+    fire_door_closed = LaunchConfiguration("fire_door").perform(context) == "closed"
+    world = ensure_world(
+        apt_type, Path(LaunchConfiguration("world_dir").perform(context)), fire_door_closed
+    )
     pose = spawn_pose(apt_type)
 
     render_engine = LaunchConfiguration("render_engine").perform(context)
@@ -175,6 +182,13 @@ def generate_launch_description() -> LaunchDescription:
                               description="Gazebo 를 llvmpipe(소프트웨어 GL)로 실행. "
                                           "WSL에서는 켜야 gpu_lidar 가 동작한다. "
                                           "실 GPU 환경이면 false 가 훨씬 빠르다"),
+        DeclareLaunchArgument("fire_door", default_value="closed",
+                              choices=["closed", "open"],
+                              description="복도/홀 끝 방화문 상태 (명세 §2.2의 두 상태). "
+                                          "기본이 closed 인 이유: 열어 두면 문 너머가 빈 공간이라 "
+                                          "LiDAR 광선이 새어나가 맵에 부채꼴 허위 자유공간이 "
+                                          "생긴다. 문 너머 계단실을 월드에 만들기 전까지는 "
+                                          "닫힌 상태가 기준 맵에 맞다"),
         DeclareLaunchArgument("world_dir", default_value=default_world_dir,
                               description="월드 SDF 디렉터리. 없으면 생성기가 만든다"),
     ]

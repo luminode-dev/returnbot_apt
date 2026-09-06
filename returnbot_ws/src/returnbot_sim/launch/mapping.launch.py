@@ -34,6 +34,7 @@ def generate_launch_description() -> LaunchDescription:
             "rviz": LaunchConfiguration("rviz"),
             "software_rendering": LaunchConfiguration("software_rendering"),
             "render_engine": LaunchConfiguration("render_engine"),
+            "fire_door": LaunchConfiguration("fire_door"),
         }.items(),
     )
 
@@ -60,6 +61,9 @@ def generate_launch_description() -> LaunchDescription:
                               description="WSL에서는 켜야 gpu_lidar 가 동작한다"),
         DeclareLaunchArgument("render_engine", default_value="ogre2",
                               choices=["ogre", "ogre2"], description="ign-rendering 엔진"),
+        DeclareLaunchArgument("fire_door", default_value="closed",
+                              choices=["closed", "open"],
+                              description="방화문 상태. 기준 맵은 closed 로 만든다"),
         gazebo,
         slam,
     ])
