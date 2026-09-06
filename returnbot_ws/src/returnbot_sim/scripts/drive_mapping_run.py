@@ -195,26 +195,31 @@ class MappingDriver(Node):
         return 0
 
     def _run_corridor(self) -> None:
-        """복도 왕복. 편복도는 개방측 난간 때문에 한쪽 반사가 약해 왕복이 특히 중요하다."""
+        """전진 후 **후진**으로 복귀한다. 복도에서는 제자리 선회를 하지 않는다.
+
+        왜 선회하지 않는가 (실측으로 확정한 결론):
+
+          - 20 m 복도에서 LD19 의 사거리는 12 m 라 복도 축 방향 광선은 항상 inf 다.
+            slam_toolbox 는 inf 광선을 최대사거리까지 '자유공간'으로 레이트레이싱한다.
+          - 제자리 선회 중에는 캐스터 구형 근사 탓에 자세 오차가 생긴다.
+            그 순간의 inf 광선이 벽을 관통하는 대각선 자유공간으로 찍혀 부채꼴
+            아티팩트가 남는다.
+          - 대조 실험: 편도 주행(선회 없음) 맵은 20.20 x 1.45 m 로 복도 그 자체이며
+            아티팩트가 전혀 없다. 경사로를 없애도(ramp_grade=0) 아티팩트는 그대로였다.
+            유형 C(홀)는 360도 회전을 두 번 하는데도 깨끗한데, 홀이 좁아 모든 광선이
+            벽에 닿아 inf 가 없기 때문이다.
+
+        LiDAR 가 360도라 후진해도 관측 범위 손실이 없다. 선회 성능 자체(명세 §1
+        검증항목 3의 피벗턴 경로 밀림)는 Phase 3 주행 평가에서 따로 다룬다.
+        """
         out = self.drive_distance(self.forward)
         self.get_logger().info(f"전진 {out:.2f} m (목표 {self.forward:.2f} m)")
         if not self.round_trip:
-            self.get_logger().info("round_trip=false — 선회·복귀 생략")
+            self.get_logger().info("round_trip=false — 복귀 생략")
             return
-        self._pivot(math.pi)
-        back = self.drive_distance(self.forward)
-        self.get_logger().info(f"복귀 {back:.2f} m")
-        self._pivot(math.pi)
-
-    def _pivot(self, angle: float) -> None:
-        """선회 앞뒤로 완전히 멈춰 스캔 매처가 자세를 다시 잡을 시간을 준다.
-
-        움직이는 도중의 자세 오차가 곧바로 맵에 찍히기 때문에, 선회 전후로
-        정지 스캔을 몇 장 넣어 주는 것만으로도 아티팩트가 줄어든다.
-        """
         self.stop(2.0)
-        self.rotate(angle)
-        self.stop(2.0)
+        back = self.drive_distance(-self.forward)
+        self.get_logger().info(f"후진 복귀 {back:.2f} m")
 
     def _run_hall(self) -> None:
         """홀은 좁아 왕복이 무의미하다. 제자리 360도 + 짧은 전후진으로 벽을 고루 훑는다."""
