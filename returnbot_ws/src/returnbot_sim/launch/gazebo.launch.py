@@ -19,14 +19,8 @@ from pathlib import Path
 import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    ExecuteProcess,
-    IncludeLaunchDescription,
-    OpaqueFunction,
-)
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -84,22 +78,25 @@ def launch_setup(context, *args, **kwargs):
     world = ensure_world(apt_type, Path(LaunchConfiguration("world_dir").perform(context)))
     pose = spawn_pose(apt_type)
 
-    # -r: 시작하자마자 물리를 돌린다. -s: 서버만(헤드리스).
-    #
-    # --render-engine: gpu_lidar 는 헤드리스에서도 오프스크린 렌더링을 한다. WSLg의
-    # GL3Plus 드라이버는 ogre2(ogre-next)가 쓰는 텍스처 복사를 구현하지 않아
-    # `Ogre::UnimplementedException ... GL3PlusTextureGpu::copyTo` 로 서버가 죽는다.
-    # ogre(v1) 엔진은 같은 기능을 다른 경로로 처리해 WSL에서 동작한다.
-    # 네이티브 리눅스 + 실 GPU 라면 ogre2 가 품질·성능 모두 낫다.
     render_engine = LaunchConfiguration("render_engine").perform(context)
-    gz_args = f"-r {'-s ' if headless else ''}--render-engine {render_engine} {world}"
+    software_gl = LaunchConfiguration("software_rendering").perform(context).lower() == "true"
 
-    gz = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            str(Path(get_package_share_directory("ros_gz_sim")) / "launch" / "gz_sim.launch.py")
-        ),
-        launch_arguments={"gz_args": gz_args}.items(),
-    )
+    # gpu_lidar 는 헤드리스에서도 오프스크린 렌더링을 한다. WSLg의 기본 GL 드라이버
+    # (d3d12 백엔드)는 여기서 필요한 기능이 빠져 있어 두 가지로 망가진다:
+    #   - ogre2: `Ogre::UnimplementedException ... GL3PlusTextureGpu::copyTo` 로 서버가 죽음
+    #   - ogre1: 죽지는 않지만 전 방향이 range_min(0.05 m)으로 나오는 쓰레기 스캔
+    # llvmpipe(소프트웨어 래스터라이저)로 강제하면 두 엔진 모두 정상 동작한다.
+    # 실 GPU가 있는 네이티브 리눅스에서는 software_rendering:=false 로 끄는 것이 빠르다.
+    #
+    # Gazebo 프로세스에만 적용한다. RViz 는 하드웨어 GL 로 두는 편이 훨씬 부드럽다.
+    gz_env = {"LIBGL_ALWAYS_SOFTWARE": "1"} if software_gl else {}
+
+    gz_cmd = ["ign", "gazebo", "-r"]
+    if headless:
+        gz_cmd.append("-s")          # 서버만
+    gz_cmd += ["--render-engine", render_engine, str(world)]
+
+    gz = ExecuteProcess(cmd=gz_cmd, output="screen", additional_env=gz_env)
 
     xacro_file = sim_share / "urdf" / "returnbot_gz.urdf.xacro"
     command = ["xacro ", str(xacro_file)]
@@ -170,11 +167,14 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("headless", default_value="false",
                               description="true 면 Gazebo GUI 없이 서버만 실행"),
         DeclareLaunchArgument("rviz", default_value="true", description="RViz2 실행 여부"),
-        DeclareLaunchArgument("render_engine", default_value="ogre",
+        DeclareLaunchArgument("render_engine", default_value="ogre2",
                               choices=["ogre", "ogre2"],
-                              description="ign-rendering 엔진. WSL에서는 ogre2가 "
-                                          "gpu_lidar 렌더링 중 죽으므로 ogre 가 기본. "
-                                          "네이티브 GPU 환경이면 ogre2 권장"),
+                              description="ign-rendering 엔진"),
+        DeclareLaunchArgument("software_rendering", default_value="true",
+                              choices=["true", "false"],
+                              description="Gazebo 를 llvmpipe(소프트웨어 GL)로 실행. "
+                                          "WSL에서는 켜야 gpu_lidar 가 동작한다. "
+                                          "실 GPU 환경이면 false 가 훨씬 빠르다"),
         DeclareLaunchArgument("world_dir", default_value=default_world_dir,
                               description="월드 SDF 디렉터리. 없으면 생성기가 만든다"),
     ]

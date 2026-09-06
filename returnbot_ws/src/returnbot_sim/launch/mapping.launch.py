@@ -32,6 +32,8 @@ def generate_launch_description() -> LaunchDescription:
             "apt_type": LaunchConfiguration("apt_type"),
             "headless": LaunchConfiguration("headless"),
             "rviz": LaunchConfiguration("rviz"),
+            "software_rendering": LaunchConfiguration("software_rendering"),
+            "render_engine": LaunchConfiguration("render_engine"),
         }.items(),
     )
 
@@ -53,6 +55,11 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("headless", default_value="false",
                               description="Gazebo GUI 없이 서버만"),
         DeclareLaunchArgument("rviz", default_value="true", description="RViz2 실행 여부"),
+        DeclareLaunchArgument("software_rendering", default_value="true",
+                              choices=["true", "false"],
+                              description="WSL에서는 켜야 gpu_lidar 가 동작한다"),
+        DeclareLaunchArgument("render_engine", default_value="ogre2",
+                              choices=["ogre", "ogre2"], description="ign-rendering 엔진"),
         gazebo,
         slam,
     ])

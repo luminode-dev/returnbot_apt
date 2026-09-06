@@ -70,11 +70,20 @@ class MappingDriver(Node):
     def _spin_once(self) -> None:
         rclpy.spin_once(self, timeout_sec=0.05)
 
+    def _now(self) -> float:
+        """경과 시간 기준 [s].
+
+        반복 횟수 x 0.05 로 시간을 세면 안 된다. spin_once 는 메시지가 이미 와 있으면
+        곧바로 반환하므로, odom 50 Hz 에서는 루프가 훨씬 빨리 돌아 '180초 타임아웃'이
+        실제로는 3.5초 만에 걸린다. 실제로 그 버그로 3 m 주행이 0.98 m 에서 잘렸다.
+        use_sim_time 이 켜져 있으면 ROS 클럭이 /clock(시뮬 시간)을 따라간다.
+        """
+        return self.get_clock().now().nanoseconds / 1e9
+
     def wait_for_odom(self, timeout: float = 30.0) -> bool:
-        elapsed = 0.0
-        while rclpy.ok() and self.x is None and elapsed < timeout:
+        deadline = self._now() + timeout
+        while rclpy.ok() and self.x is None and self._now() < deadline:
             self._spin_once()
-            elapsed += 0.05
         if self.x is None:
             self.get_logger().error("/odom 을 받지 못했다. 브릿지와 diff_drive 플러그인 확인 필요")
             return False
@@ -88,25 +97,27 @@ class MappingDriver(Node):
         self.cmd_pub.publish(msg)
 
     def stop(self, seconds: float = 1.0) -> None:
-        elapsed = 0.0
-        while rclpy.ok() and elapsed < seconds:
+        deadline = self._now() + seconds
+        while rclpy.ok() and self._now() < deadline:
             self.publish(0.0, 0.0)
             self._spin_once()
-            elapsed += 0.05
 
     def drive_distance(self, distance: float, timeout: float = 180.0) -> float:
         """직진. 실제 이동 거리를 돌려준다 (문턱·경사로에서 밀리면 여기서 드러난다)."""
         x0, y0 = self.x, self.y
         travelled = 0.0
-        elapsed = 0.0
+        deadline = self._now() + timeout
+        timed_out = False
         sign = 1.0 if distance >= 0 else -1.0
-        while rclpy.ok() and travelled < abs(distance) and elapsed < timeout:
+        while rclpy.ok() and travelled < abs(distance):
+            if self._now() >= deadline:
+                timed_out = True
+                break
             self.publish(sign * self.v, 0.0)
             self._spin_once()
-            elapsed += 0.05
             travelled = math.hypot(self.x - x0, self.y - y0)
         self.stop(0.5)
-        if elapsed >= timeout:
+        if timed_out:
             self.get_logger().warn(
                 f"직진 타임아웃: 목표 {abs(distance):.2f} m 중 {travelled:.2f} m 만 이동"
             )
@@ -114,19 +125,21 @@ class MappingDriver(Node):
 
     def rotate(self, angle: float, timeout: float = 120.0) -> float:
         """제자리 회전. 명세 Phase 3의 rotate-in-place 정책과 같은 동작이다."""
-        start = self.yaw
         turned = 0.0
-        previous = start
-        elapsed = 0.0
+        previous = self.yaw
+        deadline = self._now() + timeout
+        timed_out = False
         sign = 1.0 if angle >= 0 else -1.0
-        while rclpy.ok() and turned < abs(angle) and elapsed < timeout:
+        while rclpy.ok() and turned < abs(angle):
+            if self._now() >= deadline:
+                timed_out = True
+                break
             self.publish(0.0, sign * self.w)
             self._spin_once()
-            elapsed += 0.05
             turned += abs(wrap(self.yaw - previous))
             previous = self.yaw
         self.stop(0.5)
-        if elapsed >= timeout:
+        if timed_out:
             self.get_logger().warn(f"회전 타임아웃: {math.degrees(turned):.0f}도만 회전")
         return turned
 
