@@ -127,6 +127,26 @@ def test_lidar가_차체_최상면_위에_있다(tree, dims):
     assert pos[2] - lidar_h / 2.0 >= body_top - 1e-9
 
 
+def test_센서_링크에는_콜리전이_없다(urdf):
+    """LiDAR 하우징에 콜리전을 두면 스캔이 통째로 죽는다.
+
+    고정 조인트 링크는 SDF 변환에서 부모로 합쳐지므로, 광선이 자기 하우징
+    (반경 0.03 m)을 먼저 때리고 range_min(0.05 m)으로 클램프된다.
+    실제로 전 방향 0.05 m가 나오는 것을 Phase 2 브링업에서 확인했다.
+    """
+    for name in ("lidar_link", "imu_link", "camera_link", "camera_optical_link"):
+        link = next(l for l in urdf.findall("link") if l.get("name") == name)
+        assert link.find("collision") is None, f"{name} 에 콜리전이 있으면 안 된다"
+
+
+def test_주행부에는_콜리전이_있다(urdf):
+    """반대로 접지·충돌에 관여하는 링크는 반드시 콜리전이 있어야 한다."""
+    for name in ("base_link", "left_wheel_link", "right_wheel_link",
+                 "left_caster_link", "right_caster_link"):
+        link = next(l for l in urdf.findall("link") if l.get("name") == name)
+        assert link.find("collision") is not None, f"{name} 에 콜리전이 없다"
+
+
 def test_카메라_광학프레임이_REP103을_따른다(tree):
     """apriltag_ros 등 vision 노드가 z 전방 / x 우측 / y 하방을 전제한다."""
     _, rot = tree.link_pose("camera_optical_link")

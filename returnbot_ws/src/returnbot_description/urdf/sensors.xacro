@@ -26,12 +26,11 @@
       </geometry>
       <material name="returnbot_sensor"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="${lidar_size_x/2.0}" length="${lidar_size_z}"/>
-      </geometry>
-    </collision>
+    <!-- 콜리전 없음 (의도적).
+         고정 조인트로 붙은 링크는 SDF 변환에서 부모 링크로 합쳐지고, 그러면 LiDAR
+         광선이 자기 하우징 콜리전(반경 0.03 m)을 먼저 때린다. range_min(0.05 m)보다
+         가까워서 전 방향이 0.05 m로 클램프되어 스캔이 통째로 죽는다.
+         센서 하우징은 주행 충돌 판정에 기여하지 않으므로 콜리전을 두지 않는다. -->
     <xacro:inertial_cylinder mass="${lidar_mass}"
                              radius="${lidar_size_x/2.0}" length="${lidar_size_z}">
       <origin xyz="0 0 0" rpy="0 0 0"/>
