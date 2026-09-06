@@ -40,7 +40,11 @@ class MappingDriver(Node):
 
         self.declare_parameter("apt_type", "A")
         self.declare_parameter("linear_speed", 0.3)   # 맵 품질 우선 (운용속도 0.6보다 느리게)
-        self.declare_parameter("angular_speed", 0.5)
+        # 선회 속도는 맵 품질에 직접 영향을 준다. 제자리 선회 중 캐스터 구형 근사로
+        # 자세 오차가 생기는데, 20 m 복도에서 12 m LiDAR 의 전후방 광선은 inf 라
+        # 그 오차가 벽을 관통하는 대각선 자유공간으로 찍힌다(부채꼴 아티팩트).
+        # 편도 주행만 하면 아티팩트가 전혀 없는 것으로 원인을 확인했다.
+        self.declare_parameter("angular_speed", 0.3)
         self.declare_parameter("forward_distance", 15.0)
         self.declare_parameter("settle_seconds", 3.0)
         # 왕복 대신 편도만. 180도 선회가 맵 아티팩트에 관여하는지 가르는 실험용.
@@ -197,10 +201,20 @@ class MappingDriver(Node):
         if not self.round_trip:
             self.get_logger().info("round_trip=false — 선회·복귀 생략")
             return
-        self.rotate(math.pi)
+        self._pivot(math.pi)
         back = self.drive_distance(self.forward)
         self.get_logger().info(f"복귀 {back:.2f} m")
-        self.rotate(math.pi)
+        self._pivot(math.pi)
+
+    def _pivot(self, angle: float) -> None:
+        """선회 앞뒤로 완전히 멈춰 스캔 매처가 자세를 다시 잡을 시간을 준다.
+
+        움직이는 도중의 자세 오차가 곧바로 맵에 찍히기 때문에, 선회 전후로
+        정지 스캔을 몇 장 넣어 주는 것만으로도 아티팩트가 줄어든다.
+        """
+        self.stop(2.0)
+        self.rotate(angle)
+        self.stop(2.0)
 
     def _run_hall(self) -> None:
         """홀은 좁아 왕복이 무의미하다. 제자리 360도 + 짧은 전후진으로 벽을 고루 훑는다."""
